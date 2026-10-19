@@ -441,18 +441,51 @@ ytd-page-manager[iris-route] > :not(.iris-host) {
 }
 
 /* ◉ Send pill, matching YouTube's action-row buttons. */
-.iris-send-pill {
+/* Out-specifies ytSpecButtonShapeNextHost's own flex and margin. */
+button.iris-send-pill {
   flex: none;
-  margin-left: 8px;
-  padding: 0 16px 0 12px;
-  gap: 6px;
+  /* Share gets no left margin of its own, so the gap after Send is ours too. */
+  margin: 0 8px;
 }
 .iris-send-pill svg {
+  display: block;
   width: 24px;
   height: 24px;
 }
-.iris-send-pill[aria-expanded="true"] {
-  background: var(--iris-chip-hover);
+.iris-send-pill:hover .ytSpecTouchFeedbackShapeFill,
+.iris-send-pill[aria-expanded="true"] .ytSpecTouchFeedbackShapeFill {
+  opacity: 0.1;
+}
+.iris-send-pill:active .ytSpecTouchFeedbackShapeFill {
+  opacity: 0.2;
+}
+
+/* YouTube's tooltip (yt-tooltip). */
+.iris-tooltip {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  border: 0;
+  padding: 8px;
+  border-radius: 4px;
+  background: #616161;
+  opacity: 0.9;
+  color: #fff;
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.15s ease-out;
+}
+@starting-style {
+  .iris-tooltip:popover-open {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .iris-tooltip {
+    transition: none;
+  }
 }
 
 /* Composer */
