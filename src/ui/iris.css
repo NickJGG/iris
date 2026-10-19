@@ -14,6 +14,7 @@
   --iris-chip-hover: var(--yt-spec-button-chip-background-hover, rgba(0, 0, 0, 0.1));
   --iris-primary-fg: var(--yt-spec-text-primary-inverse, #fff);
   --iris-menu-bg: var(--yt-spec-menu-background, #fff);
+  --iris-raised: var(--yt-spec-raised-background, #fff);
   /* YouTube's notification red, as on the bell badge. */
   --iris-red: #cc0000;
   --iris-blue: var(--yt-spec-call-to-action, #065fd4);
@@ -31,6 +32,7 @@ html[dark] .iris-guide-entry {
   --iris-chip-hover: var(--yt-spec-button-chip-background-hover, rgba(255, 255, 255, 0.2));
   --iris-primary-fg: var(--yt-spec-text-primary-inverse, #0f0f0f);
   --iris-menu-bg: var(--yt-spec-menu-background, #282828);
+  --iris-raised: var(--yt-spec-raised-background, #212121);
   --iris-blue: var(--yt-spec-call-to-action, #3ea6ff);
 }
 
@@ -488,24 +490,7 @@ button.iris-send-pill {
   }
 }
 
-/* Composer */
-.iris-composer {
-  box-sizing: border-box;
-  width: 320px;
-  max-width: calc(100vw - 16px);
-  padding: 12px 0 8px;
-  border-radius: 12px;
-  background: var(--iris-menu-bg);
-  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.25);
-  font-size: 14px;
-  line-height: 20px;
-  text-align: left;
-}
-/* Below the masthead (z-index 2020), so it scrolls under it like page content. */
-.iris-composer-popover {
-  position: absolute;
-  z-index: 2000;
-}
+/* Composer, shaped like YouTube's Share dialog. */
 .iris-composer-backdrop {
   position: fixed;
   inset: 0;
@@ -514,95 +499,179 @@ button.iris-send-pill {
   place-items: center;
   background: rgba(0, 0, 0, 0.6);
 }
+.iris-composer {
+  position: relative;
+  box-sizing: border-box;
+  width: 588px;
+  max-width: calc(100vw - 32px);
+  padding: 24px 0 16px;
+  border-radius: 12px;
+  outline: 0;
+  background: var(--iris-raised);
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.25);
+  font-size: 14px;
+  line-height: 20px;
+  text-align: left;
+}
 .iris-composer-title {
-  margin: 0;
-  padding: 0 16px 8px;
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 22px;
+  margin: 0 0 16px;
+  padding: 0 56px;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 26px;
+  text-align: center;
 }
-.iris-composer-search {
-  margin: 0 16px 6px;
+.iris-composer-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
 }
-.iris-composer-list {
-  max-height: 240px;
-  overflow-y: auto;
+.iris-send-row {
+  position: relative;
+  margin: 0 30px;
 }
-.iris-composer-list > .iris-empty,
-.iris-composer-list > .iris-error {
-  margin: 8px 16px;
+.iris-send-row > .iris-empty,
+.iris-send-row > .iris-error {
+  margin: 8px 0;
+  text-align: center;
 }
-.iris-composer-friend {
+.iris-send-targets {
   display: flex;
+  gap: 4px;
+  padding: 4px 0 8px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+.iris-send-target {
+  display: flex;
+  flex: none;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 6px 16px;
+  gap: 8px;
+  width: 92px;
+  padding: 4px 0 0;
+  border: 0;
+  background: none;
+  color: var(--iris-text);
+  font: inherit;
   cursor: pointer;
 }
-.iris-composer-friend:hover {
-  background: var(--iris-layer);
-}
-.iris-composer-friend[aria-disabled="true"] {
-  color: var(--iris-text-disabled);
+.iris-send-target[aria-disabled="true"] {
+  opacity: 0.45;
   cursor: default;
 }
-.iris-composer-friend[aria-disabled="true"]:hover {
-  background: none;
+.iris-send-avatar {
+  position: relative;
+  display: block;
 }
-.iris-composer-friend[aria-disabled="true"] .iris-person-handle {
-  color: inherit;
-}
-.iris-composer-friend .iris-person {
-  font-size: 14px;
-}
-.iris-composer input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  margin: 0;
-  flex: none;
-  accent-color: var(--iris-text);
-  cursor: pointer;
-}
-.iris-composer-sent {
+.iris-send-name {
+  max-width: 100%;
+  overflow: hidden;
   font-size: 12px;
+  line-height: 18px;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
-.iris-composer-note-wrap {
-  position: relative;
-  margin: 8px 16px 0;
+.iris-send-tick {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--iris-raised);
+  border-radius: 50%;
+  background: var(--iris-text);
+  color: var(--iris-primary-fg);
+}
+.iris-send-tick[hidden] {
+  display: none;
+}
+.iris-send-tick svg {
+  width: 14px;
+  height: 14px;
+}
+.iris-send-scroll {
+  position: absolute;
+  top: 14px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--iris-raised);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  color: var(--iris-text);
+  cursor: pointer;
+}
+.iris-send-scroll[hidden] {
+  display: none;
+}
+.iris-send-scroll svg {
+  width: 24px;
+  height: 24px;
+}
+.iris-send-scroll-prev {
+  left: -16px;
+}
+.iris-send-scroll-next {
+  right: -16px;
+}
+/* YouTube's link field, holding the note instead. */
+.iris-composer-notebox {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin: 20px 30px 0;
+  padding: 13px 16px 13px 22px;
+  border: 1px solid var(--iris-layer);
+  border-radius: 12px;
+  background: var(--iris-bg);
 }
 .iris-composer-note {
-  display: block;
-  box-sizing: border-box;
-  width: 100%;
-  padding: 6px 0 16px;
+  flex: 1;
+  min-width: 0;
+  height: 22px;
+  max-height: 132px;
+  padding: 0;
   border: 0;
-  border-bottom: 1px solid var(--iris-text-2);
   outline: 0;
   resize: none;
   background: none;
   color: var(--iris-text);
   font: inherit;
-}
-.iris-composer-note:focus {
-  border-bottom: 2px solid var(--iris-text);
+  font-size: 16px;
+  line-height: 22px;
 }
 .iris-composer-note::placeholder {
   color: var(--iris-text-2);
 }
 .iris-composer-counter {
-  position: absolute;
-  right: 0;
-  bottom: 2px;
+  flex: none;
   color: var(--iris-text-2);
-  font-size: 11px;
-  line-height: 14px;
+  font-size: 12px;
+  line-height: 22px;
+}
+.iris-composer-counter[hidden] {
+  display: none;
+}
+.iris-composer-rule {
+  margin: 30px 30px 0;
+  border: 0;
+  border-top: 1px solid var(--iris-layer);
 }
 .iris-composer-foot {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
-  padding: 12px 16px 0;
+  margin: 12px 30px 0;
 }
 .iris-composer-foot .iris-btn {
   margin-left: auto;
@@ -610,8 +679,15 @@ button.iris-send-pill {
 .iris-composer-start {
   display: flex;
   align-items: center;
-  gap: 6px;
-  color: var(--iris-text-2);
+  gap: 12px;
+  font-size: 16px;
+  cursor: pointer;
+}
+.iris-composer-start input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  margin: 0 8px 0 0;
+  accent-color: var(--iris-text);
   cursor: pointer;
 }
 .iris-composer-time {
@@ -628,10 +704,45 @@ button.iris-send-pill {
   border-bottom-color: var(--iris-text);
 }
 .iris-composer .iris-notice {
-  margin: 8px 16px 0;
+  margin: 8px 30px 0;
 }
 .iris-composer .iris-notice:empty {
   display: none;
+}
+
+/* YouTube's bottom-left notification (yt-notification-action-renderer). */
+.iris-toast {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  z-index: 2400;
+  box-sizing: border-box;
+  min-width: 288px;
+  max-width: calc(100vw - 24px);
+  padding: 14px 24px;
+  border-radius: 8px;
+  background: var(--iris-text);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  color: var(--iris-primary-fg);
+  font-size: 14px;
+  line-height: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: opacity 0.2s ease-out, transform 0.2s ease-out, visibility 0s 0.2s;
+}
+.iris-toast-open {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .iris-toast,
+  .iris-toast-open {
+    transform: none;
+    transition: none;
+  }
 }
 
 /* Share cards, matching YouTube's rich grid items. */

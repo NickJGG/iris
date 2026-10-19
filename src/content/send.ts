@@ -1,6 +1,6 @@
 /**
- * Sending from YouTube: the ◉ Send pill in the watch page's action row, and the composer the
- * right-click menu opens. YouTube re-renders the row freely, so a document observer puts the pill
+ * Sending from YouTube: the ◉ Send pill in the watch page's action row, which opens the composer
+ * modal with Start at, and the same modal without it from the right-click menu. YouTube re-renders the row freely, so a document observer puts the pill
  * back whenever it goes missing. Signed out, both route to the Feed's first run instead.
  */
 import { request } from '../shared/messages';
@@ -65,13 +65,13 @@ pill.addEventListener('click', () => {
   if (videoId) void openSend(videoId, pill);
 });
 
-/** Opens the composer for a video: under `anchor` with Start at, or as a modal without. */
-export async function openSend(videoId: string, anchor?: HTMLElement): Promise<void> {
+/** Opens the composer for a video, with Start at when it comes from the pill (`opener`). */
+export async function openSend(videoId: string, opener?: HTMLElement): Promise<void> {
   // On error (e.g. Iris unconfigured) open anyway: the composer shows it.
   const auth = await request('getAuthState').catch(() => null);
   if (auth && (!auth.signedIn || !auth.profile.handle)) return location.assign(FEED_HREF);
-  const currentTime = anchor ? document.querySelector<HTMLVideoElement>('#movie_player video')?.currentTime ?? 0 : undefined;
-  openComposer({ videoId, anchor, currentTime });
+  const currentTime = opener ? document.querySelector<HTMLVideoElement>('#movie_player video')?.currentTime ?? 0 : undefined;
+  openComposer({ videoId, opener, currentTime });
 }
 
 // YouTube has no stable hook on Share itself (its label is localized); it follows like/dislike.
