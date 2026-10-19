@@ -64,7 +64,7 @@ export async function refreshCounts(): Promise<Counts> {
   return counts;
 }
 
-const isNewer = (createdAt: string, seenAt: string | null) => !seenAt || Date.parse(createdAt) > Date.parse(seenAt);
+export const isNewer = (createdAt: string, seenAt: string | null) => !seenAt || Date.parse(createdAt) > Date.parse(seenAt);
 
 export async function markSeen(kind: SeenKind): Promise<null> {
   const { error } = await supabase().rpc('mark_seen', { kind });

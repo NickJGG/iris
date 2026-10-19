@@ -136,7 +136,7 @@ export function shareCard(share: Share, kind: CardKind, actions: CardActions = {
     ),
     h('a', { class: 'iris-share-thumb', href, tabindex: -1, 'aria-hidden': 'true' },
       h('img', { src: `https://i.ytimg.com/vi/${share.video_id}/mqdefault.jpg`, alt: '', loading: 'lazy' }),
-      unwatched ? h('span', { class: 'iris-share-new' }, 'New') : null,
+      unwatched && share.is_new ? h('span', { class: 'iris-share-new' }, 'New') : null,
     ),
     h('div', { class: 'iris-share-body' },
       picture(share.channel_avatar, share.channel ?? title, 36),

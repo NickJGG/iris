@@ -53,6 +53,8 @@ export interface Share {
   created_at: string;
   /** Always null in Sent: senders get no watched receipt. */
   watched_at: string | null;
+  /** Arrived after your last look at the Inbox; always false in Sent. */
+  is_new: boolean;
   user: Profile;
 }
 

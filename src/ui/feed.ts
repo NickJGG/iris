@@ -31,6 +31,13 @@ export function mountFeed(root: HTMLElement): () => void {
   let counts: Counts = { shares: 0, requests: 0 };
   let notice = '';
   let generation = 0;
+  // markSeen clears is_new on the next fetch; New badges should stay until you leave the Feed.
+  const newShares = new Set<string>();
+
+  const keepNew = (shares: Share[]) => shares.map((share) => {
+    if (share.is_new) newShares.add(share.id);
+    return { ...share, is_new: newShares.has(share.id) };
+  });
 
   const show = (...nodes: HTMLElement[]) => el.replaceChildren(...nodes);
 
@@ -57,6 +64,7 @@ export function mountFeed(root: HTMLElement): () => void {
       profile = auth.profile;
       [friends, inbox, sent, counts] = await Promise.all([request('getFriends'), request('getInbox'), request('getSent'), request('getCounts')]);
       if (current !== generation) return;
+      inbox = keepNew(inbox);
       renderShell();
       markSeen();
     } catch (e) {
@@ -71,6 +79,7 @@ export function mountFeed(root: HTMLElement): () => void {
       const next = await Promise.all([request('getFriends'), request('getInbox'), request('getSent'), request('getCounts')]);
       if (current !== generation) return;
       [friends, inbox, sent, counts] = next;
+      inbox = keepNew(inbox);
       notice = message;
     } catch (e) {
       notice = errorText(e);

@@ -1,6 +1,6 @@
 import type { SendSharesArgs, SendSharesResult, Share } from '../shared/types';
 import { VIDEO_ID_PATTERN } from '../shared/video';
-import { isUnwatched, refreshCounts } from './counts';
+import { isNewer, isUnwatched, refreshCounts } from './counts';
 import { supabase } from './supabase';
 
 const NOTE_MAX = 140;
@@ -101,14 +101,21 @@ export async function sendShares({ videoId, recipients, note, startSeconds }: Se
 }
 
 export async function getInbox(): Promise<Share[]> {
-  const { data, error } = await supabase()
-    .from('shares')
-    .select(`${SHARE_COLUMNS}, watched_at, user:profiles!shares_sender_id_fkey(${PROFILE_COLUMNS})`)
-    .eq('recipient_id', await userId())
-    .order('created_at', { ascending: false })
-    .limit(LIST_LIMIT);
-  if (error) throw error;
-  return data as unknown as Share[];
+  const client = supabase();
+  const id = await userId();
+  const [shares, marks] = await Promise.all([
+    client
+      .from('shares')
+      .select(`${SHARE_COLUMNS}, watched_at, user:profiles!shares_sender_id_fkey(${PROFILE_COLUMNS})`)
+      .eq('recipient_id', id)
+      .order('created_at', { ascending: false })
+      .limit(LIST_LIMIT),
+    client.from('seen_marks').select('shares_seen_at').eq('user_id', id).maybeSingle(),
+  ]);
+  if (shares.error) throw shares.error;
+  if (marks.error) throw marks.error;
+  const seen = marks.data?.shares_seen_at ?? null;
+  return (shares.data as unknown as Omit<Share, 'is_new'>[]).map((share) => ({ ...share, is_new: isNewer(share.created_at, seen) }));
 }
 
 export async function getSent(): Promise<Share[]> {
@@ -120,7 +127,7 @@ export async function getSent(): Promise<Share[]> {
     .order('created_at', { ascending: false })
     .limit(LIST_LIMIT);
   if (error) throw error;
-  return (data as unknown as Omit<Share, 'watched_at'>[]).map((share) => ({ ...share, watched_at: null }));
+  return (data as unknown as Omit<Share, 'watched_at' | 'is_new'>[]).map((share) => ({ ...share, watched_at: null, is_new: false }));
 }
 
 export async function unsendShare(id: string): Promise<null> {
