@@ -14,10 +14,16 @@ const moreIcon = () =>
     d: 'M12 16.5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3Zm0-6a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3Zm0-6a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3Z',
   });
 
-/** A ⋮ button that opens a small action menu under it, flipping left or up when it would leave the window, as YouTube's does. */
-export function moreMenu(label: string, items: MenuItem[]): HTMLElement {
+export const signOutIcon = menuIcon('M20 3v18H8v-1h11V4H8V3h12zm-8.9 12.1.7.7 4.7-4.8-4.8-4.8-.7.7 3.6 3.6H4v1h10.7l-3.6 3.6z');
+
+/**
+ * A ⋮ button that opens a small action menu under it, flipping left or up when it would leave the
+ * window, as YouTube's does. An optional `header` sits above the items, ruled off from them.
+ */
+export function moreMenu(label: string, items: MenuItem[], header?: HTMLElement, menuClass = ''): HTMLElement {
   const button = h('button', { class: 'iris-icon-btn', type: 'button', 'aria-label': label, 'aria-haspopup': 'menu', 'aria-expanded': 'false' }, moreIcon());
-  const menu = h('div', { class: 'iris-menu', role: 'menu', hidden: true });
+  const menu = h('div', { class: `iris-menu ${menuClass}`.trim(), role: 'menu', hidden: true });
+  if (header) menu.append(header, h('hr', { class: 'iris-menu-rule' }));
   const wrap = h('div', { class: 'iris-menu-wrap' }, button, menu);
 
   const close = () => {
@@ -59,7 +65,7 @@ export function moreMenu(label: string, items: MenuItem[]): HTMLElement {
     button.setAttribute('aria-expanded', 'true');
     document.addEventListener('click', onOutside, true);
     document.addEventListener('keydown', onKey, true);
-    (menu.firstElementChild as HTMLElement | null)?.focus();
+    menu.querySelector<HTMLElement>('.iris-menu-item')?.focus();
   });
   return wrap;
 }

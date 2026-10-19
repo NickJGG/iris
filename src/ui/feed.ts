@@ -4,9 +4,10 @@
  */
 import { onEvent, request } from '../shared/messages';
 import type { Counts, FriendsState, Profile, SeenKind, Share } from '../shared/types';
-import { errorText, eyeIcon, h } from './dom';
+import { avatar, displayName, errorText, eyeIcon, h } from './dom';
 import { handleCard, signInCard } from './first-run';
 import { friendsPanel } from './friends';
+import { moreMenu, signOutIcon } from './menu';
 import { shareGrid } from './share-card';
 
 type Tab = 'inbox' | 'sent' | 'friends';
@@ -124,16 +125,27 @@ export function mountFeed(root: HTMLElement): () => void {
         return button;
       }),
     );
-    const signOut = h('button', {
-      class: 'iris-link',
-      type: 'button',
-      onclick: () => request('signOut').then(load, (e) => show(errorCard(errorText(e)))),
-    }, 'Sign out');
+    const account = moreMenu(
+      'Iris account',
+      [{
+        label: 'Sign out of Iris',
+        icon: signOutIcon,
+        action: () => request('signOut').then(load, (e) => show(errorCard(errorText(e)))),
+      }],
+      h('div', { class: 'iris-menu-head' },
+        h('div', { class: 'iris-menu-head-label' }, 'Signed in to Iris as'),
+        h('div', { class: 'iris-menu-head-who' },
+          avatar(profile, 40),
+          h('div', {}, h('div', {}, displayName(profile)), h('div', {}, `@${profile.handle}`)),
+        ),
+      ),
+      'iris-menu-account',
+    );
 
     show(
       h('header', { class: 'iris-feed-head' },
         h('h1', { class: 'iris-title' }, eyeIcon(), 'Iris'),
-        h('div', { class: 'iris-whoami' }, `@${profile.handle}`, ' · ', signOut),
+        account,
       ),
       tabs,
       h('section', { class: 'iris-panel', role: 'tabpanel' }, panel()),

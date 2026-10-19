@@ -106,8 +106,7 @@ ytd-page-manager[iris-route] > :not(.iris-host) {
 .iris-feed-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  gap: 4px;
   margin-bottom: 16px;
 }
 .iris-title {
@@ -122,9 +121,6 @@ ytd-page-manager[iris-route] > :not(.iris-host) {
 .iris-title svg {
   width: 40px;
   height: 40px;
-}
-.iris-whoami {
-  color: var(--iris-text-2);
 }
 
 .iris-tabs {
@@ -430,6 +426,31 @@ ytd-page-manager[iris-route] > :not(.iris-host) {
   text-align: left;
   white-space: nowrap;
   cursor: pointer;
+}
+/* Account menu: who you are, ruled off from the actions. */
+.iris-menu-account {
+  min-width: 300px;
+}
+.iris-menu-head {
+  padding: 4px 16px 12px;
+}
+.iris-menu-head-label {
+  margin-bottom: 8px;
+  color: var(--iris-text-2);
+  font-size: 12px;
+  line-height: 18px;
+}
+.iris-menu-head-who {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  font-size: 16px;
+  line-height: 22px;
+}
+.iris-menu-rule {
+  margin: 0 0 8px;
+  border: 0;
+  border-top: 1px solid var(--iris-layer);
 }
 .iris-menu-item svg {
   width: 24px;
