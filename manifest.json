@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Iris",
+  "name": "Iris for YouTube",
   "version": "0.1.0",
   "description": "Send YouTube videos to friends, and see what they sent you, right inside YouTube.",
   "browser_specific_settings": {
