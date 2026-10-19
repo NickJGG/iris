@@ -9,6 +9,7 @@ import { handleCard, signInCard } from './first-run';
 import { friendsPanel } from './friends';
 import { moreMenu, signOutIcon } from './menu';
 import { shareGrid } from './share-card';
+import { showToast } from './toast';
 
 type Tab = 'inbox' | 'sent' | 'friends';
 
@@ -100,7 +101,10 @@ export function mountFeed(root: HTMLElement): () => void {
   }
 
   function unsend(share: Share): void {
-    request('unsendShare', { id: share.id }).then(() => refresh('Unsent.'), (e) => refresh(errorText(e)));
+    request('unsendShare', { id: share.id }).then(() => {
+      showToast(`Unsent from ${displayName(share.user)}`);
+      return refresh();
+    }, (e) => refresh(errorText(e)));
   }
 
   function markWatched(share: Share): void {
