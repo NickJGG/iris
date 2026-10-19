@@ -2,7 +2,7 @@
  * Typed request/response protocol between content/UI scripts and the background script,
  * which is the sole owner of the Supabase session. The background pushes `IrisEvent`s back.
  */
-import type { AuthState, FriendsState, HandleCheck, Profile } from './types';
+import type { AuthState, FriendsState, HandleCheck, Profile, SendSharesArgs, SendSharesResult } from './types';
 
 type NoArgs = Record<string, never>;
 
@@ -18,6 +18,9 @@ export interface Requests {
   declineRequest: { args: { id: string }; result: null };
   cancelRequest: { args: { id: string }; result: null };
   removeFriend: { args: { id: string }; result: null };
+  /** Ids of Friends who already have this video from you. */
+  getSentTo: { args: { videoId: string }; result: string[] };
+  sendShares: { args: SendSharesArgs; result: SendSharesResult };
   /** Replaces the sender's tab with feed.html, for when the /feed/iris mount can't happen. */
   openFeedPage: { args: NoArgs; result: null };
 }
@@ -39,7 +42,10 @@ export async function request<K extends RequestType>(
   return response.data;
 }
 
-export type IrisEvent = { type: 'authChanged' };
+export type IrisEvent =
+  | { type: 'authChanged' }
+  /** From the right-click menu: open the composer as a modal in that tab. */
+  | { type: 'openComposer'; videoId: string };
 
 export interface EventMessage {
   event: IrisEvent;

@@ -25,3 +25,17 @@ export interface FriendsState {
   outgoing: FriendRequest[];
   friends: Profile[];
 }
+
+export interface SendSharesArgs {
+  videoId: string;
+  /** Friend ids; each gets their own Share. */
+  recipients: string[];
+  note: string | null;
+  startSeconds: number | null;
+}
+
+export interface SendSharesResult {
+  sent: string[];
+  /** Recipients who already had this video from you (the unique constraint). */
+  alreadySent: string[];
+}

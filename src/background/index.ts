@@ -1,6 +1,8 @@
 import type { EventMessage, IrisEvent, RequestMessage, Response } from '../shared/messages';
 import { checkHandle, claimHandle, getAuthState, signIn, signOut } from './auth';
 import { acceptRequest, cancelRequest, declineRequest, getFriends, removeFriend, sendFriendRequest } from './friends';
+import { createMenus, onMenuClicked } from './menus';
+import { getSentTo, sendShares } from './shares';
 
 const FEED_URL = 'https://www.youtube.com/feed/iris';
 
@@ -50,6 +52,10 @@ function handle(message: RequestMessage, sender: browser.runtime.MessageSender):
       return cancelRequest(message.id);
     case 'removeFriend':
       return removeFriend(message.id);
+    case 'getSentTo':
+      return getSentTo(message.videoId);
+    case 'sendShares':
+      return sendShares(message);
     case 'openFeedPage':
       return openFeedPage(sender.tab?.id);
   }
@@ -67,5 +73,8 @@ browser.runtime.onMessage.addListener(
 );
 
 browser.runtime.onInstalled.addListener(({ reason }) => {
+  void createMenus();
   if (reason === 'install') void browser.tabs.create({ url: FEED_URL });
 });
+
+browser.menus.onClicked.addListener(onMenuClicked);

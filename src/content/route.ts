@@ -16,6 +16,9 @@ let attempt = 0;
 
 export const isFeedRoute = () => location.pathname.replace(/\/$/, '') === FEED_PATH;
 
+/** The video on a /watch page, else null. */
+export const watchVideoId = () => (location.pathname === '/watch' ? new URLSearchParams(location.search).get('v') : null);
+
 function waitFor(selector: string, timeoutMs: number): Promise<Element | null> {
   const found = document.querySelector(selector);
   if (found) return Promise.resolve(found);

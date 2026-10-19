@@ -408,3 +408,164 @@ ytd-page-manager[iris-route] > :not(.iris-host) {
   background: var(--iris-layer);
   outline: 0;
 }
+
+/* ◉ Send pill, matching YouTube's action-row buttons. */
+.iris-send-pill {
+  flex: none;
+  margin-left: 8px;
+  padding: 0 16px 0 12px;
+  gap: 6px;
+}
+.iris-send-pill svg {
+  width: 24px;
+  height: 24px;
+}
+.iris-send-pill[aria-expanded="true"] {
+  background: var(--iris-chip-hover);
+}
+
+/* Composer */
+.iris-composer {
+  box-sizing: border-box;
+  width: 320px;
+  max-width: calc(100vw - 16px);
+  padding: 12px 0 8px;
+  border-radius: 12px;
+  background: var(--iris-menu-bg);
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.25);
+  font-size: 14px;
+  line-height: 20px;
+  text-align: left;
+}
+/* Below the masthead (z-index 2020), so it scrolls under it like page content. */
+.iris-composer-popover {
+  position: absolute;
+  z-index: 2000;
+}
+.iris-composer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2300;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.6);
+}
+.iris-composer-title {
+  margin: 0;
+  padding: 0 16px 8px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 22px;
+}
+.iris-composer-search {
+  margin: 0 16px 6px;
+}
+.iris-composer-list {
+  max-height: 240px;
+  overflow-y: auto;
+}
+.iris-composer-list > .iris-empty,
+.iris-composer-list > .iris-error {
+  margin: 8px 16px;
+}
+.iris-composer-friend {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 16px;
+  cursor: pointer;
+}
+.iris-composer-friend:hover {
+  background: var(--iris-layer);
+}
+.iris-composer-friend[aria-disabled="true"] {
+  color: var(--iris-text-disabled);
+  cursor: default;
+}
+.iris-composer-friend[aria-disabled="true"]:hover {
+  background: none;
+}
+.iris-composer-friend[aria-disabled="true"] .iris-person-handle {
+  color: inherit;
+}
+.iris-composer-friend .iris-person {
+  font-size: 14px;
+}
+.iris-composer input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  flex: none;
+  accent-color: var(--iris-text);
+  cursor: pointer;
+}
+.iris-composer-sent {
+  font-size: 12px;
+  white-space: nowrap;
+}
+.iris-composer-note-wrap {
+  position: relative;
+  margin: 8px 16px 0;
+}
+.iris-composer-note {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 6px 0 16px;
+  border: 0;
+  border-bottom: 1px solid var(--iris-text-2);
+  outline: 0;
+  resize: none;
+  background: none;
+  color: var(--iris-text);
+  font: inherit;
+}
+.iris-composer-note:focus {
+  border-bottom: 2px solid var(--iris-text);
+}
+.iris-composer-note::placeholder {
+  color: var(--iris-text-2);
+}
+.iris-composer-counter {
+  position: absolute;
+  right: 0;
+  bottom: 2px;
+  color: var(--iris-text-2);
+  font-size: 11px;
+  line-height: 14px;
+}
+.iris-composer-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px 0;
+}
+.iris-composer-foot .iris-btn {
+  margin-left: auto;
+}
+.iris-composer-start {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--iris-text-2);
+  cursor: pointer;
+}
+.iris-composer-time {
+  width: 7ch;
+  padding: 2px 0;
+  border: 0;
+  border-bottom: 1px solid var(--iris-text-2);
+  outline: 0;
+  background: none;
+  color: var(--iris-text);
+  font: inherit;
+}
+.iris-composer-time:focus {
+  border-bottom-color: var(--iris-text);
+}
+.iris-composer .iris-notice {
+  margin: 8px 16px 0;
+}
+.iris-composer .iris-notice:empty {
+  display: none;
+}
