@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Iris listing image</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=block" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --fg: #f1f1f1;
+    --muted: #aaaaaa;
+    --line: rgba(255, 255, 255, 0.1);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1280px; height: 800px; overflow: hidden; }
+  body {
+    position: relative;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: Roboto, "Segoe UI", Arial, sans-serif;
+  }
+  main { position: absolute; top: 80px; bottom: 0; left: 0; right: 0; padding-bottom: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 44px; }
+  /* Left edge lines up with the widest (1120px) frame. */
+  .brand { position: absolute; top: 32px; left: 80px; display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 21px; font-weight: 500; }
+  .brand svg { width: 28px; height: 28px; color: var(--fg); }
+  h1 { font-size: 40px; font-weight: 500; letter-spacing: -0.5px; line-height: 1.2; }
+
+  .frame {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #181818;
+    box-shadow: 0 0 0 1px var(--line);
+  }
+  .frame img { position: absolute; display: block; max-width: none; }
+
+  .placeholder { display: none; padding: 28px; gap: 22px; grid-template-columns: repeat(4, 1fr); align-content: start; }
+  .missing .placeholder { display: grid; }
+  .missing img { display: none; }
+  .missing .frame { width: 640px !important; height: 400px !important; }
+  .missing .placeholder { grid-template-columns: 1fr 1fr; }
+  .ph-card { display: flex; flex-direction: column; gap: 10px; }
+  .ph-chip { height: 30px; width: 70%; border-radius: 15px; background: #272727; }
+  .ph-thumb { aspect-ratio: 16 / 9; border-radius: 12px; background: linear-gradient(135deg, #2a2a2a, #1f1f1f); }
+  .ph-line { height: 12px; border-radius: 6px; background: #2a2a2a; }
+  .ph-line.short { width: 55%; background: #222; }
+</style>
+</head>
+<body>
+  <div class="brand">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2A9.5 9.5 0 1 1 12 21A9.5 9.5 0 1 1 12 2ZM12 4A7.5 7.5 0 1 0 12 19A7.5 7.5 0 1 0 12 4ZM4.43 15.65L7.85 19.07A0.6 0.6 0 0 1 7.56 20.08L3.16 21.05A0.6 0.6 0 0 1 2.45 20.34L3.42 15.94A0.6 0.6 0 0 1 4.43 15.65ZM10.74 8.4L15.32 10.98A0.6 0.6 0 0 1 15.32 12.02L10.74 14.6A0.6 0.6 0 0 1 9.85 14.07L9.85 8.93A0.6 0.6 0 0 1 10.74 8.4Z"/></svg>
+    Iris for YouTube
+  </div>
+<main id="stage">
+  <h1 id="title"></h1>
+  <div class="frame">
+    <img id="shot" alt="">
+    <div class="placeholder" id="placeholder"></div>
+  </div>
+</main>
+<script>
+  // crop is [x, y, width, height] in the raw screenshot's pixels.
+  const SLIDES = {
+    feed:    { title: 'Videos from friends, inside YouTube', img: 'raw/feed.png', crop: [314, 192, 1776, 590] },
+    send:    { title: 'Send any video in seconds', img: 'raw/send.png', crop: [902, 538, 735, 421], radius: 24 },
+    shelf:   { title: 'Right on your home page', img: 'raw/shelf.png', crop: [317, 271, 2207, 612] },
+    sidebar: { title: 'Know when something new arrives', img: 'raw/sidebar.png' },
+  };
+  const MAX_W = 1120;
+  const MAX_H = 540;
+
+  const slide = SLIDES[location.hash.slice(1)] ?? SLIDES.feed;
+  document.getElementById('title').textContent = slide.title;
+  const stage = document.getElementById('stage');
+  const frame = stage.querySelector('.frame');
+  if (slide.radius) frame.style.borderRadius = `${slide.radius}px`;
+  document.getElementById('placeholder').innerHTML =
+    '<div class="ph-card"><div class="ph-chip"></div><div class="ph-thumb"></div><div class="ph-line"></div><div class="ph-line short"></div></div>'.repeat(2);
+  const img = document.getElementById('shot');
+  img.onerror = () => stage.classList.add('missing');
+  img.onload = () => {
+    const [x, y, w, h] = slide.crop ?? [0, 0, img.naturalWidth, img.naturalHeight];
+    // Never upscale: the raw shots are 2x, so 1:1 is already sharp.
+    const scale = Math.min(1, MAX_W / w, MAX_H / h);
+    Object.assign(frame.style, { width: `${w * scale}px`, height: `${h * scale}px` });
+    Object.assign(img.style, { width: `${img.naturalWidth * scale}px`, left: `${-x * scale}px`, top: `${-y * scale}px` });
+  };
+  img.src = slide.img;
+</script>
+</body>
+</html>

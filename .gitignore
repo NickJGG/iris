@@ -2,6 +2,7 @@ node_modules/
 dist/
 web-ext-artifacts/
 iris-source.zip
+listing/raw/
 .env
 .env.local
 .env.production
