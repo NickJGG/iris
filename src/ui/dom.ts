@@ -50,15 +50,18 @@ export const eyeIcon = () =>
 
 export const displayName = (p: Profile) => p.display_name || (p.handle ? `@${p.handle}` : 'Someone');
 
-export function avatar(profile: Profile, size = 40): HTMLElement {
+export const avatar = (profile: Profile, size = 40) => picture(profile.avatar_url, displayName(profile), size);
+
+/** A round picture, falling back to the name's first letter when there's none or it fails to load. */
+export function picture(src: string | null, name: string, size = 40): HTMLElement {
   const letter = () =>
     h('span', { class: 'iris-avatar iris-avatar-letter', style: `--iris-avatar: ${size}px`, 'aria-hidden': 'true' },
-      displayName(profile).replace(/^@/, '').charAt(0).toUpperCase());
-  if (!profile.avatar_url) return letter();
+      name.replace(/^@/, '').charAt(0).toUpperCase());
+  if (!src) return letter();
   const img = h('img', {
     class: 'iris-avatar',
     style: `--iris-avatar: ${size}px`,
-    src: profile.avatar_url,
+    src,
     alt: '',
     referrerpolicy: 'no-referrer',
   });

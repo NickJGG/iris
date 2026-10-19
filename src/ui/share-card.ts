@@ -4,7 +4,7 @@
  * overlay, so the card never changes size and the grid never reflows.
  */
 import type { Share } from '../shared/types';
-import { avatar, displayName, h } from './dom';
+import { avatar, displayName, h, picture } from './dom';
 import { moreMenu } from './menu';
 
 /** Absolute, because feed.html isn't on youtube.com. */
@@ -35,7 +35,7 @@ export function shareCard(share: Share, kind: CardKind, onUnsend?: (share: Share
   const href = watchUrl(share);
   const title = share.title ?? 'YouTube video';
   const unwatched = kind === 'inbox' && !share.watched_at;
-  const who = h('span', { class: 'iris-share-who' }, displayName(share.user));
+  const who = [avatar(share.user, 18), h('span', { class: 'iris-share-who' }, displayName(share.user))];
   const when = timeAgo(share.created_at);
 
   return h('div', { class: 'iris-share', 'data-watched': kind === 'inbox' && !unwatched ? 'true' : null },
@@ -44,12 +44,12 @@ export function shareCard(share: Share, kind: CardKind, onUnsend?: (share: Share
       unwatched ? h('span', { class: 'iris-share-new' }, 'NEW') : null,
     ),
     h('div', { class: 'iris-share-body' },
-      avatar(share.user, 36),
+      picture(share.channel_avatar, share.channel ?? title, 36),
       h('div', { class: 'iris-share-text' },
         h('a', { class: 'iris-share-title', href, title }, title),
         share.channel ? h('div', { class: 'iris-share-meta' }, share.channel) : null,
         h('div', { class: 'iris-share-meta' },
-          ...(kind === 'inbox' ? [who, ` shared · ${when}`] : ['To ', who, ` · ${when}`])),
+          ...(kind === 'inbox' ? [...who, ` shared · ${when}`] : ['To ', ...who, ` · ${when}`])),
         share.note
           ? h('div', { class: 'iris-share-note' },
               h('div', { class: 'iris-share-note-line' }, `“${share.note}”`),

@@ -25,7 +25,7 @@ Other useful commands:
 ## 1. Supabase project
 
 1. Create a project at <https://supabase.com/dashboard> (the free tier is fine). Note its **project ref**, the `<ref>` in `https://<ref>.supabase.co`.
-2. Open **SQL Editor**, paste all of `supabase/migrations/0001_init.sql`, and run it.
+2. Open **SQL Editor**, paste each file in `supabase/migrations/` in order, and run it.
 3. In a new query, paste all of `supabase/tests/rls.sql` and run it. The result must be the single row `all RLS assertions passed`. Any `FAIL: …` error names the broken rule. The script runs in one transaction and rolls back, so it leaves no test users behind.
 
 ## 2. Google OAuth client

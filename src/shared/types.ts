@@ -47,6 +47,7 @@ export interface Share {
   /** Null when oEmbed had no metadata (private or unembeddable videos). */
   title: string | null;
   channel: string | null;
+  channel_avatar: string | null;
   start_seconds: number | null;
   note: string | null;
   created_at: string;

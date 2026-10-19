@@ -5,25 +5,46 @@ import { supabase } from './supabase';
 
 const NOTE_MAX = 140;
 const PROFILE_COLUMNS = 'id, handle, display_name, avatar_url';
-const SHARE_COLUMNS = 'id, video_id, title, channel, start_seconds, note, created_at';
+const SHARE_COLUMNS = 'id, video_id, title, channel, channel_avatar, start_seconds, note, created_at';
 /** No paging yet; plenty for a private circle. */
 const LIST_LIMIT = 200;
 
 interface VideoMeta {
   title: string | null;
   channel: string | null;
+  channel_avatar: string | null;
 }
+
+const NO_META: VideoMeta = { title: null, channel: null, channel_avatar: null };
 
 /** Title and channel via oEmbed. Missing metadata never blocks a send (oEmbed 401s on unembeddable videos). */
 async function videoMeta(videoId: string): Promise<VideoMeta> {
   const watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
   try {
     const response = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(watchUrl)}&format=json`);
-    if (!response.ok) return { title: null, channel: null };
-    const data = (await response.json()) as { title?: string; author_name?: string };
-    return { title: data.title ?? null, channel: data.author_name ?? null };
+    if (!response.ok) return NO_META;
+    const data = (await response.json()) as { title?: string; author_name?: string; author_url?: string };
+    return {
+      title: data.title ?? null,
+      channel: data.author_name ?? null,
+      channel_avatar: data.author_url ? await channelAvatar(data.author_url) : null,
+    };
   } catch {
-    return { title: null, channel: null };
+    return NO_META;
+  }
+}
+
+const OG_IMAGE = /<meta property="og:image" content="([^"]+)"/;
+
+/** The channel page's og:image is its avatar, at 900px; the `=s88-` swap asks for a card-sized one. */
+async function channelAvatar(channelUrl: string): Promise<string | null> {
+  try {
+    const response = await fetch(channelUrl);
+    if (!response.ok) return null;
+    const url = OG_IMAGE.exec(await response.text())?.[1].replaceAll('&amp;', '&');
+    return url?.startsWith('https://') ? url.replace(/=s\d+-/, '=s88-') : null;
+  } catch {
+    return null;
   }
 }
 
@@ -51,7 +72,7 @@ export async function sendShares({ videoId, recipients, note, startSeconds }: Se
   const start = startSeconds && startSeconds > 0 ? Math.floor(startSeconds) : null;
 
   await userId();
-  const { title, channel } = await videoMeta(videoId);
+  const { title, channel, channel_avatar } = await videoMeta(videoId);
   const client = supabase();
   const results = await Promise.all(
     [...new Set(recipients)].map(async (recipient_id) => {
@@ -60,6 +81,7 @@ export async function sendShares({ videoId, recipients, note, startSeconds }: Se
         video_id: videoId,
         title,
         channel,
+        channel_avatar,
         start_seconds: start,
         note: trimmed,
       });
