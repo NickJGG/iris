@@ -1,6 +1,7 @@
 node_modules/
 dist/
 web-ext-artifacts/
+iris-source.zip
 .env
 .env.local
 .env.production
