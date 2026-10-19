@@ -56,12 +56,16 @@ export interface Share {
   user: Profile;
 }
 
+/** What's New: arrived since you last viewed its Feed tab. */
 export interface Counts {
-  /** Unwatched Shares in the Inbox. */
-  unwatched: number;
-  /** Incoming Friend requests. */
+  /** Unwatched Shares newer than your last look at the Inbox. */
+  shares: number;
+  /** Incoming Friend requests newer than your last look at the Friends tab. */
   requests: number;
 }
+
+/** Which Feed tab was just viewed: Inbox clears `shares`, Friends clears `requests`. */
+export type SeenKind = 'shares' | 'requests';
 
 /** Live facts about a video from its watch page; null when unavailable. */
 export interface VideoStats {

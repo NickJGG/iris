@@ -3,14 +3,15 @@
  * re-renders the guide freely (and only builds it once the drawer first opens on narrow windows),
  * so a document observer puts the entry back whenever it goes missing.
  */
+import type { Counts } from '../shared/types';
 import { eyeIcon, h } from '../ui/dom';
 import { FEED_HREF, isFeedRoute } from './route';
 
-const badge = h('span', { class: 'iris-count', hidden: true });
+const dot = h('span', { class: 'iris-dot', role: 'img', hidden: true });
 const entry = h('a', { class: 'iris-guide-entry', href: FEED_HREF, title: 'Iris' },
   eyeIcon(),
   h('span', { class: 'iris-guide-label' }, 'Iris'),
-  badge,
+  dot,
 );
 
 function insert(): void {
@@ -27,10 +28,12 @@ export function updateActive(): void {
   else entry.removeAttribute('aria-current');
 }
 
-/** Unwatched Share count; 0 hides the badge. */
-export function setGuideBadge(count: number): void {
-  badge.textContent = String(count);
-  badge.hidden = count <= 0;
+/** YouTube's subscription newness dot, on while anything is New. */
+export function setGuideDot(counts: Counts): void {
+  const label = [counts.shares > 0 && 'New Shares', counts.requests > 0 && 'New friend requests'].filter(Boolean).join(', ');
+  dot.hidden = !label;
+  dot.setAttribute('aria-label', label);
+  entry.title = label ? `Iris · ${label}` : 'Iris';
 }
 
 export function startGuide(): void {

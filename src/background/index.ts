@@ -1,7 +1,7 @@
 import type { RequestMessage, Response } from '../shared/messages';
 import { checkHandle, claimHandle, getAuthState, signIn, signOut } from './auth';
 import { broadcast } from './broadcast';
-import { refreshCounts, startCounts } from './counts';
+import { markSeen, refreshCounts, startCounts } from './counts';
 import { acceptRequest, cancelRequest, declineRequest, getFriends, removeFriend, sendFriendRequest } from './friends';
 import { createMenus, onMenuClicked } from './menus';
 import { getInbox, getSent, getSentTo, markWatched, sendShares, unsendShare } from './shares';
@@ -73,6 +73,8 @@ function handle(message: RequestMessage, sender: browser.runtime.MessageSender):
       return markWatched(message.videoId);
     case 'getCounts':
       return refreshCounts();
+    case 'markSeen':
+      return markSeen(message.kind);
     case 'getVideoStats':
       return getVideoStats(message.videoId);
     case 'openFeedPage':

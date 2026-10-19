@@ -2,7 +2,7 @@
  * Typed request/response protocol between content/UI scripts and the background script,
  * which is the sole owner of the Supabase session. The background pushes `IrisEvent`s back.
  */
-import type { AuthState, Counts, FriendsState, HandleCheck, Profile, SendSharesArgs, SendSharesResult, Share, VideoStats } from './types';
+import type { AuthState, Counts, FriendsState, HandleCheck, Profile, SeenKind, SendSharesArgs, SendSharesResult, Share, VideoStats } from './types';
 
 type NoArgs = Record<string, never>;
 
@@ -28,6 +28,8 @@ export interface Requests {
   /** Marks your unwatched Shares of this video watched; returns how many. */
   markWatched: { args: { videoId: string }; result: number };
   getCounts: { args: NoArgs; result: Counts };
+  /** You just viewed the Feed tab for this kind; its New count drops to 0. */
+  markSeen: { args: { kind: SeenKind }; result: null };
   /** Views, age and duration from the watch page, cached a few hours; null when unavailable. */
   getVideoStats: { args: { videoId: string }; result: VideoStats | null };
   /** Replaces the sender's tab with feed.html, for when the /feed/you?iris mount can't happen. */
@@ -55,7 +57,7 @@ export type IrisEvent =
   | { type: 'authChanged' }
   /** From the right-click menu: open the composer as a modal in that tab. */
   | { type: 'openComposer'; videoId: string }
-  /** Unwatched Shares or incoming requests changed; receivers re-fetch what they show. */
+  /** Shares, requests or seen marks changed; receivers re-fetch what they show. */
   | { type: 'counts'; counts: Counts };
 
 export interface EventMessage {

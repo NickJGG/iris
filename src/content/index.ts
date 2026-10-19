@@ -1,7 +1,7 @@
 import { onEvent, request } from '../shared/messages';
 import { closeComposer } from '../ui/composer';
 import { injectStyles } from '../ui/styles';
-import { setGuideBadge, startGuide, updateActive } from './guide';
+import { setGuideDot, startGuide, updateActive } from './guide';
 import { leaveRoute, syncRoute, watchVideoId } from './route';
 import { openSend, startSendPill } from './send';
 import { refreshShelf, startShelf } from './shelf';
@@ -23,7 +23,7 @@ function markWatched(): void {
 }
 
 function updateCounts(): void {
-  request('getCounts').then((counts) => setGuideBadge(counts.unwatched), () => setGuideBadge(0));
+  request('getCounts').then(setGuideDot, () => setGuideDot({ shares: 0, requests: 0 }));
 }
 
 markWatched();
@@ -46,7 +46,7 @@ onEvent((event) => {
     updateCounts();
     void refreshShelf();
   } else if (event.type === 'counts') {
-    setGuideBadge(event.counts.unwatched);
+    setGuideDot(event.counts);
     void refreshShelf();
   }
 });

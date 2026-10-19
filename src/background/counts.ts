@@ -1,10 +1,11 @@
 /**
- * Unwatched-Share and incoming-request counts, pushed to the toolbar badge and (as a `counts` event)
- * to the guide badge, Feed and shelf. Firefox suspends the event page when idle, so realtime only
- * helps while it's awake; a one-minute alarm is what guarantees freshness.
+ * New counts: unwatched Shares and incoming requests that arrived after their seen mark (when you
+ * last viewed the Inbox or Friends tab; no mark means never). Pushed to the toolbar badge and (as a
+ * `counts` event) to the guide dot, Feed and shelf. Firefox suspends the event page when idle, so
+ * realtime only helps while it's awake; a one-minute alarm is what guarantees freshness.
  */
 import type { RealtimeChannel } from '@supabase/supabase-js';
-import type { Counts } from '../shared/types';
+import type { Counts, SeenKind } from '../shared/types';
 import { broadcast } from './broadcast';
 import { supabase } from './supabase';
 
@@ -23,27 +24,37 @@ export const isUnwatched = (videoId: string) => unwatchedVideos.has(videoId);
 export async function refreshCounts(): Promise<Counts> {
   const client = supabase();
   const { data: { session } } = await client.auth.getSession();
-  let counts: Counts = { unwatched: 0, requests: 0 };
+  let counts: Counts = { shares: 0, requests: 0 };
   let signature = '';
 
   if (!session) {
     unwatchedVideos = new Set();
     stopRealtime();
   } else {
-    const [shares, requests] = await Promise.all([
-      client.from('shares').select('id, video_id').eq('recipient_id', session.user.id).is('watched_at', null),
+    const [shares, requests, marks] = await Promise.all([
+      client.from('shares').select('id, video_id, created_at').eq('recipient_id', session.user.id).is('watched_at', null),
       // RLS returns only requests to you that you haven't declined.
-      client.from('friend_requests').select('id'),
+      client.from('friend_requests').select('id, created_at'),
+      client.from('seen_marks').select('shares_seen_at, requests_seen_at').eq('user_id', session.user.id).maybeSingle(),
     ]);
     if (shares.error) throw shares.error;
     if (requests.error) throw requests.error;
+    if (marks.error) throw marks.error;
     unwatchedVideos = new Set(shares.data.map((s) => s.video_id as string));
-    counts = { unwatched: shares.data.length, requests: requests.data.length };
-    signature = [...shares.data.map((s) => s.id), '|', ...requests.data.map((r) => r.id)].sort().join();
+    const sharesSeen = marks.data?.shares_seen_at ?? null;
+    const requestsSeen = marks.data?.requests_seen_at ?? null;
+    counts = {
+      shares: shares.data.filter((s) => isNewer(s.created_at, sharesSeen)).length,
+      requests: requests.data.filter((r) => isNewer(r.created_at, requestsSeen)).length,
+    };
+    // The marks are in it so that marking seen broadcasts even when no rows changed.
+    signature = [...shares.data.map((s) => s.id), '|', ...requests.data.map((r) => r.id)].sort().join()
+      + `|${sharesSeen}|${requestsSeen}`;
     startRealtime(session.user.id);
   }
 
-  void browser.action.setBadgeText({ text: counts.unwatched > 99 ? '99+' : counts.unwatched ? String(counts.unwatched) : '' });
+  const total = counts.shares + counts.requests;
+  void browser.action.setBadgeText({ text: total > 99 ? '99+' : total ? String(total) : '' });
   // Kept in session storage, not a variable, so an event page waking up doesn't re-announce unchanged counts.
   const { [SIGNATURE_KEY]: previous } = await browser.storage.session.get(SIGNATURE_KEY);
   if (previous !== signature) {
@@ -51,6 +62,15 @@ export async function refreshCounts(): Promise<Counts> {
     void broadcast({ type: 'counts', counts });
   }
   return counts;
+}
+
+const isNewer = (createdAt: string, seenAt: string | null) => !seenAt || Date.parse(createdAt) > Date.parse(seenAt);
+
+export async function markSeen(kind: SeenKind): Promise<null> {
+  const { error } = await supabase().rpc('mark_seen', { kind });
+  if (error) throw error;
+  await refreshCounts();
+  return null;
 }
 
 function scheduleRefresh(): void {

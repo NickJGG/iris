@@ -32,6 +32,10 @@ _Avoid_: post, message, recommendation
 The state of a Share once its recipient has opened that video anywhere on YouTube; the sender is never told.
 _Avoid_: seen, read
 
+**New**:
+An unwatched Share or a Friend request that arrived after you last viewed its Feed tab (Inbox or Friends). Anything New lights the dot on the Iris guide entry; viewing the tab clears it but leaves Shares unwatched.
+_Avoid_: unread, unseen
+
 **Unsend**:
 The sender deleting one of their Shares, removing it from the recipient's Inbox.
 _Avoid_: delete, recall

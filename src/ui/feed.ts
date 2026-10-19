@@ -3,7 +3,7 @@
  * root element, so /feed/you?iris on YouTube and feed.html render the same thing.
  */
 import { onEvent, request } from '../shared/messages';
-import type { FriendsState, Profile, Share } from '../shared/types';
+import type { Counts, FriendsState, Profile, SeenKind, Share } from '../shared/types';
 import { errorText, eyeIcon, h } from './dom';
 import { handleCard, signInCard } from './first-run';
 import { friendsPanel } from './friends';
@@ -12,6 +12,7 @@ import { shareGrid } from './share-card';
 type Tab = 'inbox' | 'sent' | 'friends';
 
 const TABS: [Tab, string][] = [['inbox', 'Inbox'], ['sent', 'Sent'], ['friends', 'Friends']];
+const SEEN_BY: Partial<Record<Tab, SeenKind>> = { inbox: 'shares', friends: 'requests' };
 
 export function mountFeed(root: HTMLElement): () => void {
   const el = h('div', { class: 'iris-feed' });
@@ -26,6 +27,7 @@ export function mountFeed(root: HTMLElement): () => void {
   let friends: FriendsState | null = null;
   let inbox: Share[] = [];
   let sent: Share[] = [];
+  let counts: Counts = { shares: 0, requests: 0 };
   let notice = '';
   let generation = 0;
 
@@ -52,8 +54,10 @@ export function mountFeed(root: HTMLElement): () => void {
         }));
       }
       profile = auth.profile;
-      [friends, inbox, sent] = await Promise.all([request('getFriends'), request('getInbox'), request('getSent')]);
-      if (current === generation) renderShell();
+      [friends, inbox, sent, counts] = await Promise.all([request('getFriends'), request('getInbox'), request('getSent'), request('getCounts')]);
+      if (current !== generation) return;
+      renderShell();
+      markSeen();
     } catch (e) {
       if (current === generation) show(errorCard(errorText(e)));
     }
@@ -63,15 +67,26 @@ export function mountFeed(root: HTMLElement): () => void {
   async function refresh(message = ''): Promise<void> {
     const current = generation;
     try {
-      const next = await Promise.all([request('getFriends'), request('getInbox'), request('getSent')]);
+      const next = await Promise.all([request('getFriends'), request('getInbox'), request('getSent'), request('getCounts')]);
       if (current !== generation) return;
-      [friends, inbox, sent] = next;
+      [friends, inbox, sent, counts] = next;
       notice = message;
     } catch (e) {
       notice = errorText(e);
     }
     const active = document.activeElement;
     if (!(active instanceof HTMLInputElement && el.contains(active) && active.value)) renderShell();
+    markSeen();
+  }
+
+  /**
+   * Viewing a tab clears what's New on it, including anything that arrives while it's on screen.
+   * Only called while the count is above 0, so the `counts` event this sets off ends the cycle.
+   */
+  function markSeen(): void {
+    const kind = SEEN_BY[tab];
+    if (!profile || !kind || !counts[kind] || document.visibilityState !== 'visible') return;
+    request('markSeen', { kind }).catch(() => {});
   }
 
   function unsend(share: Share): void {
@@ -89,7 +104,6 @@ export function mountFeed(root: HTMLElement): () => void {
 
   function renderShell(): void {
     if (!profile || !friends) return;
-    const incoming = friends.incoming.length;
     const tabs = h('div', { class: 'iris-tabs', role: 'tablist' },
       ...TABS.map(([id, label]) => {
         const button = h('button', {
@@ -101,10 +115,11 @@ export function mountFeed(root: HTMLElement): () => void {
             tab = id;
             notice = '';
             renderShell();
+            markSeen();
           },
         }, label);
-        if (id === 'friends' && incoming) {
-          button.append(h('span', { class: 'iris-count', 'aria-label': `${incoming} friend requests` }, String(incoming)));
+        if (id === 'friends' && counts.requests) {
+          button.append(h('span', { class: 'iris-dot', role: 'img', 'aria-label': 'New friend requests' }));
         }
         return button;
       }),
@@ -141,11 +156,13 @@ export function mountFeed(root: HTMLElement): () => void {
     if (event.type === 'authChanged') void load();
     else if (event.type === 'counts' && profile) void refresh(notice);
   });
+  document.addEventListener('visibilitychange', markSeen);
   void load();
 
   return () => {
     generation++;
     unsubscribe();
+    document.removeEventListener('visibilitychange', markSeen);
     el.remove();
   };
 }

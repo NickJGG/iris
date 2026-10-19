@@ -1,6 +1,7 @@
 /* Iris UI. YouTube's own palette through its --yt-spec-* variables, so light/dark follow YouTube.
    Not every variable is defined where Iris mounts, so the fallbacks are YouTube's own values for the
-   current theme (<html dark> on YouTube; feed.html defines the variables itself). No blue. */
+   current theme (<html dark> on YouTube; feed.html defines the variables itself). No blue, except
+   the newness dot, which mirrors YouTube's own mark on guide subscriptions. */
 
 .iris-root,
 .iris-guide-entry {
@@ -15,6 +16,7 @@
   --iris-menu-bg: var(--yt-spec-menu-background, #fff);
   /* YouTube's notification red, as on the bell badge. */
   --iris-red: #cc0000;
+  --iris-blue: var(--yt-spec-call-to-action, #065fd4);
   font-family: "Roboto", "Arial", sans-serif;
   color: var(--iris-text);
 }
@@ -29,6 +31,7 @@ html[dark] .iris-guide-entry {
   --iris-chip-hover: var(--yt-spec-button-chip-background-hover, rgba(255, 255, 255, 0.2));
   --iris-primary-fg: var(--yt-spec-text-primary-inverse, #0f0f0f);
   --iris-menu-bg: var(--yt-spec-menu-background, #282828);
+  --iris-blue: var(--yt-spec-call-to-action, #3ea6ff);
 }
 
 .iris-root :focus-visible,
@@ -80,19 +83,15 @@ ytd-page-manager[iris-route] > :not(.iris-host) {
   white-space: nowrap;
 }
 
-.iris-count {
-  min-width: 18px;
-  padding: 0 6px;
-  border-radius: 9px;
-  box-sizing: border-box;
-  background: var(--iris-red);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 18px;
-  text-align: center;
+.iris-dot {
+  flex: none;
+  width: 4px;
+  height: 4px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--iris-blue);
 }
-.iris-count[hidden] {
+.iris-dot[hidden] {
   display: none;
 }
 
