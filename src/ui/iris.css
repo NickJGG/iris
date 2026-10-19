@@ -740,12 +740,17 @@ ytd-page-manager[iris-route] > :not(.iris-host) {
 }
 
 /* From friends shelf on YouTube home. */
-/* ytd-rich-grid-renderer is a centred flex column, which would shrink the shelf to its header's width. */
+/* ytd-rich-grid-renderer is a centred flex column, which would shrink the shelf to its header's width.
+   The margins put it where YouTube's own sections sit: edges flush with the video cards (capped and
+   centred like them on wide windows), 24px under the chips and a row's gap above the videos, where
+   #contents' unvariabled 24px top padding supplies the rest. */
 .iris-shelf {
+  --iris-shelf-inset: max(
+    calc(var(--ytd-rich-grid-gutter-margin, 16px) + var(--ytd-rich-grid-item-margin, 16px) / 2),
+    calc((100% - var(--ytd-rich-grid-content-max-width, 100%)) / 2)
+  );
   align-self: stretch;
-  margin: 0 calc(var(--ytd-rich-grid-item-margin, 16px) / 2) 32px;
-  padding-bottom: 32px;
-  border-bottom: 4px solid var(--iris-layer);
+  margin: 24px var(--iris-shelf-inset) calc(var(--ytd-rich-grid-row-margin, 32px) - 24px);
 }
 .iris-shelf[hidden] {
   display: none;
