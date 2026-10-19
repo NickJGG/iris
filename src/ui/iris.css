@@ -737,7 +737,9 @@ ytd-page-manager[iris-route] > :not(.iris-host) {
 }
 
 /* From friends shelf on YouTube home. */
+/* ytd-rich-grid-renderer is a centred flex column, which would shrink the shelf to its header's width. */
 .iris-shelf {
+  align-self: stretch;
   margin: 0 calc(var(--ytd-rich-grid-item-margin, 16px) / 2) 32px;
   padding-bottom: 32px;
   border-bottom: 4px solid var(--iris-layer);
