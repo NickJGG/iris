@@ -5,7 +5,7 @@
  */
 import { request } from '../shared/messages';
 import { closeComposer, isComposerOpen, openComposer } from '../ui/composer';
-import { eyeIcon, h } from '../ui/dom';
+import { logoIcon, h } from '../ui/dom';
 import { FEED_HREF, watchVideoId } from './route';
 
 const ACTION_ROW = 'ytd-watch-flexy:not([hidden]) ytd-watch-metadata #top-level-buttons-computed';
@@ -24,7 +24,7 @@ const pill = h('button', {
   'aria-haspopup': 'dialog',
   'aria-expanded': 'false',
 },
-  h('div', { class: 'ytSpecButtonShapeNextIcon ytSpecButtonShapeNextElevatedContent', 'aria-hidden': 'true' }, eyeIcon()),
+  h('div', { class: 'ytSpecButtonShapeNextIcon ytSpecButtonShapeNextElevatedContent', 'aria-hidden': 'true' }, logoIcon()),
   h('div', { class: 'ytSpecButtonShapeNextButtonTextContent ytSpecButtonShapeNextElevatedContent' }, 'Send'),
   h('div', { class: 'ytSpecTouchFeedbackShapeHost ytSpecTouchFeedbackShapeTouchResponse', 'aria-hidden': 'true' },
     h('div', { class: 'ytSpecTouchFeedbackShapeStroke' }),

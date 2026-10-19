@@ -4,12 +4,12 @@
  * so a document observer puts the entry back whenever it goes missing.
  */
 import type { Counts } from '../shared/types';
-import { eyeIcon, h } from '../ui/dom';
+import { logoIcon, h } from '../ui/dom';
 import { FEED_HREF, isFeedRoute } from './route';
 
 const dot = h('span', { class: 'iris-dot', role: 'img', hidden: true });
 const entry = h('a', { class: 'iris-guide-entry', href: FEED_HREF, title: 'Iris' },
-  eyeIcon(),
+  logoIcon(),
   h('span', { class: 'iris-guide-label' }, 'Iris'),
   dot,
 );

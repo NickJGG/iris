@@ -8,7 +8,7 @@ import { request } from '../shared/messages';
 import type { Share, VideoStats } from '../shared/types';
 import { formatTime, formatViews, timeAgo, timeAgoLong } from '../shared/video';
 import { openComposer } from './composer';
-import { avatar, displayName, eyeIcon, h, picture } from './dom';
+import { avatar, displayName, logoIcon, h, picture } from './dom';
 import { menuIcon, moreMenu, type MenuItem } from './menu';
 
 /** Absolute, because feed.html isn't on youtube.com. */
@@ -93,7 +93,7 @@ function cardMenu(share: Share, kind: CardKind, unwatched: boolean, title: strin
   const { onUnsend, onMarkWatched, onNotice } = actions;
   const items: (MenuItem | null)[] = [
     unwatched && onMarkWatched ? { label: 'Mark as watched', icon: watchedIcon, action: () => onMarkWatched(share) } : null,
-    { label: 'Send to friends…', icon: eyeIcon, action: () => openComposer({ videoId: share.video_id }) },
+    { label: 'Send to friends…', icon: logoIcon, action: () => openComposer({ videoId: share.video_id }) },
     {
       label: 'Copy link',
       icon: linkIcon,

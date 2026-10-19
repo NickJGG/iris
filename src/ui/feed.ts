@@ -4,7 +4,7 @@
  */
 import { onEvent, request } from '../shared/messages';
 import type { Counts, FriendsState, Profile, SeenKind, Share } from '../shared/types';
-import { avatar, displayName, errorText, eyeIcon, h } from './dom';
+import { avatar, displayName, errorText, logoIcon, h } from './dom';
 import { handleCard, signInCard } from './first-run';
 import { friendsPanel } from './friends';
 import { moreMenu, signOutIcon } from './menu';
@@ -44,7 +44,7 @@ export function mountFeed(root: HTMLElement): () => void {
 
   const errorCard = (message: string) => {
     const retry = h('button', { class: 'iris-btn', type: 'button', onclick: () => void load() }, 'Try again');
-    return h('div', { class: 'iris-card' }, h('div', { class: 'iris-card-eye' }, eyeIcon()), h('h2', {}, 'Iris can’t connect'), h('p', {}, message), retry);
+    return h('div', { class: 'iris-card' }, h('div', { class: 'iris-card-logo' }, logoIcon()), h('h2', {}, 'Iris can’t connect'), h('p', {}, message), retry);
   };
 
   async function load(): Promise<void> {
@@ -157,7 +157,7 @@ export function mountFeed(root: HTMLElement): () => void {
 
     show(
       h('header', { class: 'iris-feed-head' },
-        h('h1', { class: 'iris-title' }, eyeIcon(), 'Iris'),
+        h('h1', { class: 'iris-title' }, logoIcon(), 'Iris'),
         account,
       ),
       tabs,

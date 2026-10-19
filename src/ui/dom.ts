@@ -38,15 +38,7 @@ export function svg(viewBox: string, ...paths: { d: string; fillRule?: string }[
 }
 
 /** Same shape as icons/iris.svg. */
-export const eyeIcon = () =>
-  svg(
-    '0 0 24 24',
-    {
-      d: 'M1.2 12A11.859 11.859 0 0 1 22.8 12A11.859 11.859 0 0 1 1.2 12ZM3.49 12A9.819 9.819 0 0 1 20.51 12A9.819 9.819 0 0 1 3.49 12Z',
-      fillRule: 'evenodd',
-    },
-    { d: 'M7.92 12a4.08 4.08 0 1 0 8.16 0a4.08 4.08 0 1 0 -8.16 0Z' },
-  );
+export const logoIcon = () => svg('0 0 24 24', { d: 'M12 2A9.5 9.5 0 1 1 12 21A9.5 9.5 0 1 1 12 2ZM12 4A7.5 7.5 0 1 0 12 19A7.5 7.5 0 1 0 12 4ZM4.43 15.65L7.85 19.07A0.6 0.6 0 0 1 7.56 20.08L3.16 21.05A0.6 0.6 0 0 1 2.45 20.34L3.42 15.94A0.6 0.6 0 0 1 4.43 15.65ZM10.74 8.4L15.32 10.98A0.6 0.6 0 0 1 15.32 12.02L10.74 14.6A0.6 0.6 0 0 1 9.85 14.07L9.85 8.93A0.6 0.6 0 0 1 10.74 8.4Z' });
 
 export const displayName = (p: Profile) => p.display_name || (p.handle ? `@${p.handle}` : 'Someone');
 

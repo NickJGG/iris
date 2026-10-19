@@ -1,6 +1,6 @@
 import { request } from '../shared/messages';
 import { HANDLE_PATTERN, type Profile } from '../shared/types';
-import { errorText, eyeIcon, h } from './dom';
+import { errorText, logoIcon, h } from './dom';
 
 const googleIcon = () => h('span', { class: 'iris-google-g', 'aria-hidden': 'true' }, 'G');
 
@@ -19,7 +19,7 @@ export function signInCard(onSignedIn: () => void): HTMLElement {
     }
   });
   return h('div', { class: 'iris-card' },
-    h('div', { class: 'iris-card-eye' }, eyeIcon()),
+    h('div', { class: 'iris-card-logo' }, logoIcon()),
     h('h2', {}, 'Iris'),
     h('p', {}, 'See the videos your friends send you, right here on YouTube.'),
     button,
@@ -89,7 +89,7 @@ export function handleCard(profile: Profile, onClaimed: () => void): HTMLElement
   });
 
   const form = h('form', { class: 'iris-card' },
-    h('div', { class: 'iris-card-eye' }, eyeIcon()),
+    h('div', { class: 'iris-card-logo' }, logoIcon()),
     h('h2', {}, 'Pick your handle'),
     h('p', {}, 'Friends add you by your exact handle. Nobody can browse or search for you otherwise.'),
     h('label', { class: 'iris-handle-field' }, h('span', { 'aria-hidden': 'true' }, '@'), input, status),

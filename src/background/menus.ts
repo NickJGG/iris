@@ -8,7 +8,7 @@ export async function createMenus(): Promise<void> {
   await browser.menus.removeAll();
   browser.menus.create({
     id: SEND_MENU_ID,
-    // Firefox shows the extension's eye icon beside it, so no ◉ in the title.
+    // Firefox shows the extension's icon beside it, so no ◉ in the title.
     title: 'Send with Iris…',
     contexts: ['link'],
     targetUrlPatterns: ['*://www.youtube.com/watch?v=*', '*://youtu.be/*'],

@@ -5,7 +5,7 @@
  */
 import { request } from '../shared/messages';
 import type { Share } from '../shared/types';
-import { eyeIcon, h } from '../ui/dom';
+import { logoIcon, h } from '../ui/dom';
 import { shareCard } from '../ui/share-card';
 import { FEED_HREF } from './route';
 
@@ -19,7 +19,7 @@ let perRow = 0;
 const row = h('div', { class: 'iris-shelf-row' });
 const shelf = h('section', { class: 'iris-root iris-shelf', hidden: true, 'aria-label': 'From friends' },
   h('div', { class: 'iris-shelf-head' },
-    eyeIcon(),
+    logoIcon(),
     h('h2', { class: 'iris-shelf-title' }, 'From friends'),
     h('a', { class: 'iris-link', href: FEED_HREF }, 'See all'),
   ),
