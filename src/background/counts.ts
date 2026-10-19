@@ -32,7 +32,11 @@ export async function refreshCounts(): Promise<Counts> {
     stopRealtime();
   } else {
     const [shares, requests, marks] = await Promise.all([
-      client.from('shares').select('id, video_id, created_at').eq('recipient_id', session.user.id).is('watched_at', null),
+      client
+        .from('shares')
+        .select('id, video_id, created_at, share_watches(share_id)')
+        .eq('recipient_id', session.user.id)
+        .is('share_watches', null),
       // RLS returns only requests to you that you haven't declined.
       client.from('friend_requests').select('id, created_at'),
       client.from('seen_marks').select('shares_seen_at, requests_seen_at').eq('user_id', session.user.id).maybeSingle(),

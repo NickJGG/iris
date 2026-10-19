@@ -106,7 +106,7 @@ export async function getInbox(): Promise<Share[]> {
   const [shares, marks] = await Promise.all([
     client
       .from('shares')
-      .select(`${SHARE_COLUMNS}, watched_at, user:profiles!shares_sender_id_fkey(${PROFILE_COLUMNS})`)
+      .select(`${SHARE_COLUMNS}, share_watches(watched_at), user:profiles!shares_sender_id_fkey(${PROFILE_COLUMNS})`)
       .eq('recipient_id', id)
       .order('created_at', { ascending: false })
       .limit(LIST_LIMIT),
@@ -115,11 +115,16 @@ export async function getInbox(): Promise<Share[]> {
   if (shares.error) throw shares.error;
   if (marks.error) throw marks.error;
   const seen = marks.data?.shares_seen_at ?? null;
-  return (shares.data as unknown as Omit<Share, 'is_new'>[]).map((share) => ({ ...share, is_new: isNewer(share.created_at, seen) }));
+  type Row = Omit<Share, 'watched_at' | 'is_new'> & { share_watches: { watched_at: string } | null };
+  return (shares.data as unknown as Row[]).map(({ share_watches, ...share }) => ({
+    ...share,
+    watched_at: share_watches?.watched_at ?? null,
+    is_new: isNewer(share.created_at, seen),
+  }));
 }
 
+/** Iris has no read receipts. */
 export async function getSent(): Promise<Share[]> {
-  // watched_at is readable by the sender under RLS, but Iris has no read receipts, so never fetch it.
   const { data, error } = await supabase()
     .from('shares')
     .select(`${SHARE_COLUMNS}, user:profiles!shares_recipient_id_fkey(${PROFILE_COLUMNS})`)

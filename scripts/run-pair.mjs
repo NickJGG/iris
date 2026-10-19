@@ -8,7 +8,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const webExt = resolve(root, 'node_modules/web-ext/bin/web-ext.js');
 const profiles = ['Iris', 'Iris 2'];
 
-const built = spawnSync(process.execPath, ['build.mjs'], { cwd: root, stdio: 'inherit' });
+const built = spawnSync(process.execPath, ['build.mjs', ...process.argv.slice(2)], { cwd: root, stdio: 'inherit' });
 if (built.status !== 0) process.exit(built.status ?? 1);
 
 const children = profiles.map((profile) =>

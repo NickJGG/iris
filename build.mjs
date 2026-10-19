@@ -7,13 +7,19 @@ import { fileURLToPath } from 'node:url';
 const root = dirname(fileURLToPath(import.meta.url));
 const dist = resolve(root, 'dist');
 const watch = process.argv.includes('--watch');
+const prod = process.argv.includes('--prod');
 
-const envFile = resolve(root, '.env');
+const envName = prod ? '.env.production' : '.env';
+const envFile = resolve(root, envName);
 if (existsSync(envFile)) process.loadEnvFile(envFile);
 const supabaseUrl = process.env.SUPABASE_URL ?? '';
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY ?? '';
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('build: SUPABASE_URL / SUPABASE_ANON_KEY not set; sign-in will fail until .env is filled (see SETUP.md)');
+  console.warn(`build: SUPABASE_URL / SUPABASE_ANON_KEY not set; sign-in will fail until ${envName} is filled (see SETUP.md)`);
+}
+if (prod && !supabaseUrl.startsWith('https://')) {
+  console.error(`build: --prod needs a hosted SUPABASE_URL in ${envName}, got "${supabaseUrl}"`);
+  process.exit(1);
 }
 
 await rm(dist, { recursive: true, force: true });
@@ -40,7 +46,7 @@ const options = {
   outdir: dist,
   format: 'iife',
   target: 'firefox115',
-  sourcemap: 'inline',
+  sourcemap: prod ? false : 'inline',
   loader: { '.css': 'text' },
   logLevel: 'info',
   define: {

@@ -6,14 +6,16 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
+    "build:prod": "node build.mjs --prod",
     "watch": "node build.mjs --watch",
     "typecheck": "tsc --noEmit",
     "icons": "node scripts/make-icons.mjs",
-    "package": "web-ext build --source-dir=dist --overwrite-dest",
-    "sign": "node --env-file=.env node_modules/web-ext/bin/web-ext.js sign --source-dir=dist --channel=unlisted",
+    "package": "npm run build:prod && web-ext build --source-dir=dist --overwrite-dest",
+    "sign": "npm run build:prod && node --env-file=.env node_modules/web-ext/bin/web-ext.js sign --source-dir=dist --channel=unlisted",
     "run:firefox": "web-ext run --source-dir=dist --target=firefox-desktop --url=https://www.youtube.com/",
     "run:firefox:dev": "npm run build && web-ext run --source-dir=dist --target=firefox-desktop --firefox-profile=Iris --keep-profile-changes --url=https://www.youtube.com/",
-    "run:firefox:pair": "node scripts/run-pair.mjs"
+    "run:firefox:pair": "node scripts/run-pair.mjs",
+    "run:firefox:pair:prod": "node scripts/run-pair.mjs --prod"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0"

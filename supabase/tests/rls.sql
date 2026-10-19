@@ -142,23 +142,21 @@ do $$ begin
     raise exception 'FAIL: A forged a share as B';
   exception when insufficient_privilege then null;
   end;
-  begin
-    insert into public.shares (recipient_id, video_id, watched_at) values ('00000000-0000-0000-0000-00000000000b', 'bbbbbbbbbbb', now());
-    raise exception 'FAIL: sender pre-marked a share watched';
-  exception when insufficient_privilege then null;
-  end;
 end $$;
 
--- ===== Only the recipient can mark watched ==================================================
+-- ===== Only the recipient can mark watched, and only they can see it =========================
 do $$
 declare n int;
 begin
-  perform public.mark_watched('dQw4w9WgXcQ');
-  with u as (update public.shares set watched_at = now() returning 1) select count(*) into n from u;
+  with u as (update public.shares set note = 'edited' returning 1) select count(*) into n from u;
   if n <> 0 then raise exception 'FAIL: sender updated a share directly'; end if;
-  if (select watched_at from public.shares where video_id = 'dQw4w9WgXcQ') is not null then
-    raise exception 'FAIL: sender marked a share watched';
-  end if;
+  if public.mark_watched('dQw4w9WgXcQ') <> 0 then raise exception 'FAIL: sender marked a share watched'; end if;
+  begin
+    insert into public.share_watches (share_id, user_id)
+    values ((select id from public.shares where video_id = 'dQw4w9WgXcQ'), '00000000-0000-0000-0000-00000000000b');
+    raise exception 'FAIL: sender inserted a watch directly';
+  exception when insufficient_privilege then null;
+  end;
 end $$;
 
 -- C is not a party to the share and can't see it.
@@ -176,12 +174,18 @@ do $$
 declare n int;
 begin
   if (select count(*) from public.shares) <> 1 then raise exception 'FAIL: recipient cannot see the share'; end if;
-  with u as (update public.shares set watched_at = now() returning 1) select count(*) into n from u;
+  with u as (update public.shares set note = 'edited' returning 1) select count(*) into n from u;
   if n <> 0 then raise exception 'FAIL: recipient updated a share directly'; end if;
+  if (select count(*) from public.share_watches) <> 0 then raise exception 'FAIL: share watched before anyone marked it'; end if;
+  begin
+    insert into public.share_watches (share_id, user_id)
+    values ((select id from public.shares where video_id = 'dQw4w9WgXcQ'), '00000000-0000-0000-0000-00000000000b');
+    raise exception 'FAIL: recipient inserted a watch directly';
+  exception when insufficient_privilege then null;
+  end;
   if public.mark_watched('dQw4w9WgXcQ') <> 1 then raise exception 'FAIL: recipient could not mark watched'; end if;
-  if (select watched_at from public.shares where video_id = 'dQw4w9WgXcQ') is null then
-    raise exception 'FAIL: mark_watched did not set watched_at';
-  end if;
+  if (select count(*) from public.share_watches) <> 1 then raise exception 'FAIL: mark_watched did not create a watch'; end if;
+  if public.mark_watched('dQw4w9WgXcQ') <> 0 then raise exception 'FAIL: mark_watched marked a share twice'; end if;
 
 -- ===== Only the sender can delete (Unsend) ==================================================
   with d as (delete from public.shares returning 1) select count(*) into n from d;
@@ -208,6 +212,7 @@ begin
     raise exception 'FAIL: shared to a removed friend';
   exception when insufficient_privilege then null;
   end;
+  if (select count(*) from public.share_watches) <> 0 then raise exception 'FAIL: sender can see a watch'; end if;
   with d as (delete from public.shares returning 1) select count(*) into n from d;
   if n <> 1 then raise exception 'FAIL: sender could not unsend'; end if;
 end $$;

@@ -20,7 +20,7 @@ Runs Postgres, Auth, Realtime and Studio in Docker on your machine. `supabase/co
 Other useful commands:
 - `npx supabase db reset` re-applies the migrations from scratch and wipes local data.
 - `npx supabase stop` stops the stack.
-- To switch to hosted, point `.env` at the hosted project and rebuild.
+- The hosted project lives in `.env.production` (section 4), so `.env` can stay pointed at the local stack.
 
 ## 1. Supabase project
 
@@ -54,15 +54,17 @@ To double-check the URL, load Iris, open `about:debugging#/runtime/this-firefox`
 
 ## 4. Point the build at your project
 
-1. Copy `.env.example` to `.env` (it's gitignored).
+1. Copy `.env.production.example` to `.env.production` (it's gitignored).
 2. Fill in both values from Supabase **Project Settings → API**:
    - `SUPABASE_URL` is `https://<ref>.supabase.co`.
    - `SUPABASE_ANON_KEY` is the **anon** key, or the **publishable** key on newer projects.
-3. Run `npm run build`. The values are baked into `dist/background.js`. That's safe: the anon key is public by design and RLS is what protects the data.
+3. Run `npm run build:prod`. It reads `.env.production` instead of `.env`, refuses a non-`https` URL, and leaves out source maps. The values are baked into `dist/background.js`. That's safe: the anon key is public by design and RLS is what protects the data.
+
+`npm run run:firefox:pair:prod` runs both profiles against the hosted project. `npm run package` and `npm run sign` always do a `build:prod` first. `sign` still reads the AMO credentials from `.env`.
 
 ## 5. Try sign-in (before the Feed UI exists)
 
-1. `npm run build`, then `npm run run:firefox`.
+1. `npm run build` (or `build:prod` for hosted), then `npm run run:firefox`.
 2. In `about:debugging`, find Iris's **Internal UUID**, then open `moz-extension://<uuid>/feed.html`.
 3. In that tab's console, run:
    ```js

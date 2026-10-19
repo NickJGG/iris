@@ -3,6 +3,7 @@ dist/
 web-ext-artifacts/
 .env
 .env.local
+.env.production
 *.xpi
 .DS_Store
 Thumbs.db
