@@ -1,0 +1,26 @@
+{
+  "name": "iris",
+  "version": "0.1.0",
+  "description": "Firefox extension for sending YouTube videos to friends, surfaced inside YouTube.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "icons": "node scripts/make-icons.mjs",
+    "package": "web-ext build --source-dir=dist --overwrite-dest",
+    "sign": "node --env-file=.env node_modules/web-ext/bin/web-ext.js sign --source-dir=dist --channel=unlisted",
+    "run:firefox": "web-ext run --source-dir=dist --target=firefox-desktop --url=https://www.youtube.com/"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.118.0"
+  },
+  "devDependencies": {
+    "@types/firefox-webext-browser": "^143.0.1",
+    "esbuild": "^0.24.2",
+    "supabase": "^2.121.0",
+    "typescript": "^5.9.3",
+    "web-ext": "^8.10.0"
+  }
+}

@@ -1,0 +1,10 @@
+node_modules/
+dist/
+web-ext-artifacts/
+.env
+.env.local
+*.xpi
+.DS_Store
+Thumbs.db
+supabase/.temp/
+supabase/.branches/

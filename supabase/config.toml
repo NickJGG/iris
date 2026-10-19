@@ -1,0 +1,13 @@
+# Local Supabase stack (`npx supabase start`). Unlisted settings use the CLI defaults:
+# API http://127.0.0.1:54321, DB 54322, Studio http://127.0.0.1:54323.
+project_id = "iris"
+
+[auth]
+site_url = "http://127.0.0.1:54321"
+# Firefox's identity.getRedirectURL() for iris@nick.local; see SETUP.md.
+additional_redirect_urls = ["https://c29f559808e658ca63870085bbd8ae5918763778.extensions.allizom.org/"]
+
+[auth.external.google]
+enabled = true
+client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
