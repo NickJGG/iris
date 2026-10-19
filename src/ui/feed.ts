@@ -78,6 +78,15 @@ export function mountFeed(root: HTMLElement): () => void {
     request('unsendShare', { id: share.id }).then(() => refresh('Unsent.'), (e) => refresh(errorText(e)));
   }
 
+  function markWatched(share: Share): void {
+    request('markWatched', { videoId: share.video_id }).then(() => refresh('Marked as watched.'), (e) => refresh(errorText(e)));
+  }
+
+  function showNotice(message: string): void {
+    notice = message;
+    renderShell();
+  }
+
   function renderShell(): void {
     if (!profile || !friends) return;
     const incoming = friends.incoming.length;
@@ -122,7 +131,7 @@ export function mountFeed(root: HTMLElement): () => void {
     return h('div', {},
       notice ? h('p', { class: 'iris-notice', role: 'status' }, notice) : null,
       shares.length
-        ? shareGrid(shares, tab, unsend)
+        ? shareGrid(shares, tab, { onUnsend: unsend, onMarkWatched: markWatched, onNotice: showNotice })
         : h('p', { class: 'iris-empty' },
             tab === 'inbox' ? 'Videos your friends send you will show up here.' : 'Videos you send will show up here.'),
     );

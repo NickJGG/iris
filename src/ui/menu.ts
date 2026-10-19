@@ -2,15 +2,19 @@ import { h, svg } from './dom';
 
 export interface MenuItem {
   label: string;
+  icon: () => SVGSVGElement;
   action: () => void;
 }
+
+/** A 24px single-path icon, as YouTube's menus use. */
+export const menuIcon = (d: string) => () => svg('0 0 24 24', { d });
 
 const moreIcon = () =>
   svg('0 0 24 24', {
     d: 'M12 16.5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3Zm0-6a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3Zm0-6a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3Z',
   });
 
-/** A ⋮ button that opens a small action menu below it. */
+/** A ⋮ button that opens a small action menu under it, flipping left or up when it would leave the window, as YouTube's does. */
 export function moreMenu(label: string, items: MenuItem[]): HTMLElement {
   const button = h('button', { class: 'iris-icon-btn', type: 'button', 'aria-label': label, 'aria-haspopup': 'menu', 'aria-expanded': 'false' }, moreIcon());
   const menu = h('div', { class: 'iris-menu', role: 'menu', hidden: true });
@@ -41,12 +45,17 @@ export function moreMenu(label: string, items: MenuItem[]): HTMLElement {
         close();
         item.action();
       },
-    }, item.label));
+    }, item.icon(), item.label));
   }
 
   button.addEventListener('click', () => {
     if (!menu.hidden) return close();
+    menu.removeAttribute('data-flip-x');
+    menu.removeAttribute('data-flip-y');
     menu.hidden = false;
+    const box = menu.getBoundingClientRect();
+    menu.toggleAttribute('data-flip-x', box.right > document.documentElement.clientWidth);
+    menu.toggleAttribute('data-flip-y', box.bottom > window.innerHeight && box.top - box.height - button.offsetHeight >= 0);
     button.setAttribute('aria-expanded', 'true');
     document.addEventListener('click', onOutside, true);
     document.addEventListener('keydown', onKey, true);

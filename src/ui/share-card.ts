@@ -7,8 +7,9 @@
 import { request } from '../shared/messages';
 import type { Share, VideoStats } from '../shared/types';
 import { formatTime, formatViews, timeAgo, timeAgoLong } from '../shared/video';
-import { avatar, displayName, h, picture } from './dom';
-import { moreMenu } from './menu';
+import { openComposer } from './composer';
+import { avatar, displayName, eyeIcon, h, picture } from './dom';
+import { menuIcon, moreMenu, type MenuItem } from './menu';
 
 /** Absolute, because feed.html isn't on youtube.com. */
 export function watchUrl(share: Pick<Share, 'video_id' | 'start_seconds'>): string {
@@ -77,7 +78,36 @@ function loadStatsWhenNear(card: HTMLElement, videoId: string): void {
 
 export type CardKind = 'inbox' | 'sent';
 
-export function shareCard(share: Share, kind: CardKind, onUnsend?: (share: Share) => void): HTMLElement {
+export interface CardActions {
+  onUnsend?: (share: Share) => void;
+  onMarkWatched?: (share: Share) => void;
+  /** Where to confirm an action; absent on the shelf, which has nowhere to say it. */
+  onNotice?: (message: string) => void;
+}
+
+const watchedIcon = menuIcon('M16.59 7.58 10 14.17l-3.59-3.58L5 12l5 5 8-8zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z');
+const linkIcon = menuIcon('M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z');
+const trashIcon = menuIcon('M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5-1-1h-5l-1 1H5v2h14V4z');
+
+function cardMenu(share: Share, kind: CardKind, unwatched: boolean, title: string, actions: CardActions): HTMLElement {
+  const { onUnsend, onMarkWatched, onNotice } = actions;
+  const items: (MenuItem | null)[] = [
+    unwatched && onMarkWatched ? { label: 'Mark as watched', icon: watchedIcon, action: () => onMarkWatched(share) } : null,
+    { label: 'Send to friends…', icon: eyeIcon, action: () => openComposer({ videoId: share.video_id }) },
+    {
+      label: 'Copy link',
+      icon: linkIcon,
+      action: () => navigator.clipboard.writeText(watchUrl(share)).then(
+        () => onNotice?.('Link copied.'),
+        () => onNotice?.('Couldn’t copy the link.'),
+      ),
+    },
+    kind === 'sent' && onUnsend ? { label: 'Unsend', icon: trashIcon, action: () => onUnsend(share) } : null,
+  ];
+  return moreMenu(`More actions for ${title}`, items.filter((item) => item !== null));
+}
+
+export function shareCard(share: Share, kind: CardKind, actions: CardActions = {}): HTMLElement {
   const href = watchUrl(share);
   const title = share.title ?? 'YouTube video';
   const unwatched = kind === 'inbox' && !share.watched_at;
@@ -115,9 +145,7 @@ export function shareCard(share: Share, kind: CardKind, onUnsend?: (share: Share
         share.channel ? h('div', { class: 'iris-share-meta' }, share.channel) : null,
         h('div', { class: 'iris-share-meta iris-share-stats' }),
       ),
-      kind === 'sent' && onUnsend
-        ? moreMenu(`More actions for ${title}`, [{ label: 'Unsend', action: () => onUnsend(share) }])
-        : null,
+      cardMenu(share, kind, unwatched, title, actions),
     ),
   );
   if (stats.has(share.video_id)) fillStats(card, stats.get(share.video_id)!);
@@ -125,6 +153,6 @@ export function shareCard(share: Share, kind: CardKind, onUnsend?: (share: Share
   return card;
 }
 
-export function shareGrid(shares: Share[], kind: CardKind, onUnsend?: (share: Share) => void): HTMLElement {
-  return h('div', { class: 'iris-grid' }, ...shares.map((s) => shareCard(s, kind, onUnsend)));
+export function shareGrid(shares: Share[], kind: CardKind, actions: CardActions = {}): HTMLElement {
+  return h('div', { class: 'iris-grid' }, ...shares.map((s) => shareCard(s, kind, actions)));
 }

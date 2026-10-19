@@ -396,7 +396,7 @@ ytd-page-manager[iris-route] > :not(.iris-host) {
 .iris-menu {
   position: absolute;
   top: 100%;
-  right: 0;
+  left: 0;
   z-index: 2200;
   min-width: 160px;
   padding: 8px 0;
@@ -404,20 +404,36 @@ ytd-page-manager[iris-route] > :not(.iris-host) {
   background: var(--iris-menu-bg);
   box-shadow: 0 4px 32px rgba(0, 0, 0, 0.1);
 }
+.iris-menu[data-flip-x] {
+  right: 0;
+  left: auto;
+}
+.iris-menu[data-flip-y] {
+  top: auto;
+  bottom: 100%;
+}
 .iris-menu[hidden] {
   display: none;
 }
 .iris-menu-item {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   width: 100%;
-  height: 36px;
+  height: 40px;
   padding: 0 16px;
   border: 0;
   background: none;
   color: var(--iris-text);
-  font: inherit;
+  font: 400 14px/20px "Roboto", "Arial", sans-serif;
   text-align: left;
+  white-space: nowrap;
   cursor: pointer;
+}
+.iris-menu-item svg {
+  width: 24px;
+  height: 24px;
+  flex: none;
 }
 .iris-menu-item:hover,
 .iris-menu-item:focus-visible {

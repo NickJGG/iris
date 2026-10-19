@@ -36,11 +36,14 @@ function columns(): number {
   return Math.max(1, Math.floor((row.clientWidth + GAP) / (MIN_CARD_WIDTH + GAP)));
 }
 
+// The background's counts broadcast refreshes the shelf once the Share is marked.
+const markWatched = (share: Share) => void request('markWatched', { videoId: share.video_id }).catch(() => {});
+
 function render(): void {
   perRow = columns();
   shelf.hidden = !shares.length;
   shelf.style.setProperty('--iris-per-row', String(perRow));
-  row.replaceChildren(...shares.slice(0, perRow).map((s) => shareCard(s, 'inbox')));
+  row.replaceChildren(...shares.slice(0, perRow).map((s) => shareCard(s, 'inbox', { onMarkWatched: markWatched })));
 }
 
 /** Re-fetches the Inbox; signed out (or any error) hides the shelf. */
