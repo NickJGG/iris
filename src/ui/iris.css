@@ -1,5 +1,6 @@
-/* Iris UI. YouTube's own palette through its --yt-spec-* variables, so light/dark follow YouTube;
-   the fallbacks are YouTube's light values (feed.html defines the variables itself). No blue. */
+/* Iris UI. YouTube's own palette through its --yt-spec-* variables, so light/dark follow YouTube.
+   Not every variable is defined where Iris mounts, so the fallbacks are YouTube's own values for the
+   current theme (<html dark> on YouTube; feed.html defines the variables itself). No blue. */
 
 .iris-root,
 .iris-guide-entry {
@@ -16,6 +17,18 @@
   --iris-red: #cc0000;
   font-family: "Roboto", "Arial", sans-serif;
   color: var(--iris-text);
+}
+html[dark] .iris-root,
+html[dark] .iris-guide-entry {
+  --iris-text: var(--yt-spec-text-primary, #f1f1f1);
+  --iris-text-2: var(--yt-spec-text-secondary, #aaa);
+  --iris-text-disabled: var(--yt-spec-text-disabled, #717171);
+  --iris-bg: var(--yt-spec-base-background, #0f0f0f);
+  --iris-layer: var(--yt-spec-10-percent-layer, rgba(255, 255, 255, 0.2));
+  --iris-chip: var(--yt-spec-badge-chip-background, rgba(255, 255, 255, 0.1));
+  --iris-chip-hover: var(--yt-spec-button-chip-background-hover, rgba(255, 255, 255, 0.2));
+  --iris-primary-fg: var(--yt-spec-text-primary-inverse, #0f0f0f);
+  --iris-menu-bg: var(--yt-spec-menu-background, #282828);
 }
 
 .iris-root :focus-visible,
@@ -568,4 +581,152 @@ ytd-page-manager[iris-route] > :not(.iris-host) {
 }
 .iris-composer .iris-notice:empty {
   display: none;
+}
+
+/* Share cards, matching YouTube's rich grid items. */
+.iris-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 40px 16px;
+}
+.iris-share {
+  position: relative;
+  min-width: 0;
+}
+.iris-share-thumb {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--iris-chip);
+}
+.iris-share-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.iris-share-new {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: var(--yt-spec-static-overlay-background-heavy, rgba(0, 0, 0, 0.8));
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+}
+.iris-share-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 12px;
+}
+.iris-share-text {
+  flex: 1;
+  min-width: 0;
+}
+.iris-share-title {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--iris-text);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 22px;
+  text-decoration: none;
+}
+.iris-share-meta {
+  overflow: hidden;
+  color: var(--iris-text-2);
+  font-size: 14px;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.iris-share-title + .iris-share-meta {
+  margin-top: 4px;
+}
+.iris-share-who {
+  color: var(--iris-text);
+  font-weight: 500;
+}
+.iris-share-note {
+  position: relative;
+  margin-top: 4px;
+  color: var(--iris-text-2);
+  font-size: 13px;
+  font-style: italic;
+  line-height: 18px;
+}
+.iris-share-note-line {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Floats over its own line and whatever is below, so the grid never reflows. */
+.iris-share-note-full {
+  display: none;
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  left: -10px;
+  z-index: 3;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--iris-menu-bg);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
+  color: var(--iris-text);
+  overflow-wrap: anywhere;
+}
+.iris-share:hover .iris-share-note-full,
+.iris-share:focus-within .iris-share-note-full {
+  display: block;
+}
+.iris-share-body .iris-menu-wrap {
+  margin: -8px -12px 0 0;
+}
+
+/* From friends shelf on YouTube home. */
+.iris-shelf {
+  margin: 0 calc(var(--ytd-rich-grid-item-margin, 16px) / 2) 32px;
+  padding-bottom: 32px;
+  border-bottom: 4px solid var(--iris-layer);
+}
+.iris-shelf[hidden] {
+  display: none;
+}
+.iris-shelf-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.iris-shelf-head svg {
+  width: 24px;
+  height: 24px;
+}
+.iris-shelf-title {
+  flex: 1;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 28px;
+}
+.iris-shelf-head .iris-link {
+  font-size: 14px;
+  text-decoration: none;
+}
+.iris-shelf-row {
+  display: grid;
+  grid-template-columns: repeat(var(--iris-per-row, 4), minmax(0, 1fr));
+  gap: 16px;
+}
+/* Dim the parts, not the card: opacity on the card would trap the note overlay beneath later content. */
+.iris-shelf .iris-share[data-watched] :is(.iris-share-thumb, .iris-avatar, .iris-share-title, .iris-share-meta, .iris-share-note-line) {
+  opacity: 0.55;
 }

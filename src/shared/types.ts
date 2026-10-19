@@ -39,3 +39,25 @@ export interface SendSharesResult {
   /** Recipients who already had this video from you (the unique constraint). */
   alreadySent: string[];
 }
+
+/** A Share as one side sees it; `user` is the other side (the sender in the Inbox, the recipient in Sent). */
+export interface Share {
+  id: string;
+  video_id: string;
+  /** Null when oEmbed had no metadata (private or unembeddable videos). */
+  title: string | null;
+  channel: string | null;
+  start_seconds: number | null;
+  note: string | null;
+  created_at: string;
+  /** Always null in Sent: senders get no watched receipt. */
+  watched_at: string | null;
+  user: Profile;
+}
+
+export interface Counts {
+  /** Unwatched Shares in the Inbox. */
+  unwatched: number;
+  /** Incoming Friend requests. */
+  requests: number;
+}

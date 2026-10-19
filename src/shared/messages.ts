@@ -2,7 +2,7 @@
  * Typed request/response protocol between content/UI scripts and the background script,
  * which is the sole owner of the Supabase session. The background pushes `IrisEvent`s back.
  */
-import type { AuthState, FriendsState, HandleCheck, Profile, SendSharesArgs, SendSharesResult } from './types';
+import type { AuthState, Counts, FriendsState, HandleCheck, Profile, SendSharesArgs, SendSharesResult, Share } from './types';
 
 type NoArgs = Record<string, never>;
 
@@ -21,6 +21,13 @@ export interface Requests {
   /** Ids of Friends who already have this video from you. */
   getSentTo: { args: { videoId: string }; result: string[] };
   sendShares: { args: SendSharesArgs; result: SendSharesResult };
+  /** Newest first. */
+  getInbox: { args: NoArgs; result: Share[] };
+  getSent: { args: NoArgs; result: Share[] };
+  unsendShare: { args: { id: string }; result: null };
+  /** Marks your unwatched Shares of this video watched; returns how many. */
+  markWatched: { args: { videoId: string }; result: number };
+  getCounts: { args: NoArgs; result: Counts };
   /** Replaces the sender's tab with feed.html, for when the /feed/iris mount can't happen. */
   openFeedPage: { args: NoArgs; result: null };
 }
@@ -45,7 +52,9 @@ export async function request<K extends RequestType>(
 export type IrisEvent =
   | { type: 'authChanged' }
   /** From the right-click menu: open the composer as a modal in that tab. */
-  | { type: 'openComposer'; videoId: string };
+  | { type: 'openComposer'; videoId: string }
+  /** Unwatched Shares or incoming requests changed; receivers re-fetch what they show. */
+  | { type: 'counts'; counts: Counts };
 
 export interface EventMessage {
   event: IrisEvent;

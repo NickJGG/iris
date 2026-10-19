@@ -3,10 +3,11 @@
  * root element, so /feed/iris on YouTube and feed.html render the same thing.
  */
 import { onEvent, request } from '../shared/messages';
-import type { FriendsState, Profile } from '../shared/types';
+import type { FriendsState, Profile, Share } from '../shared/types';
 import { errorText, eyeIcon, h } from './dom';
 import { handleCard, signInCard } from './first-run';
 import { friendsPanel } from './friends';
+import { shareGrid } from './share-card';
 
 type Tab = 'inbox' | 'sent' | 'friends';
 
@@ -23,6 +24,8 @@ export function mountFeed(root: HTMLElement): () => void {
   let tab: Tab = 'inbox';
   let profile: Profile | null = null;
   let friends: FriendsState | null = null;
+  let inbox: Share[] = [];
+  let sent: Share[] = [];
   let notice = '';
   let generation = 0;
 
@@ -49,24 +52,30 @@ export function mountFeed(root: HTMLElement): () => void {
         }));
       }
       profile = auth.profile;
-      friends = await request('getFriends');
+      [friends, inbox, sent] = await Promise.all([request('getFriends'), request('getInbox'), request('getSent')]);
       if (current === generation) renderShell();
     } catch (e) {
       if (current === generation) show(errorCard(errorText(e)));
     }
   }
 
-  async function refreshFriends(message = ''): Promise<void> {
+  /** Re-fetches everything, then re-renders unless the User is mid-typing (it would wipe the field). */
+  async function refresh(message = ''): Promise<void> {
     const current = generation;
     try {
-      const next = await request('getFriends');
+      const next = await Promise.all([request('getFriends'), request('getInbox'), request('getSent')]);
       if (current !== generation) return;
-      friends = next;
+      [friends, inbox, sent] = next;
       notice = message;
     } catch (e) {
       notice = errorText(e);
     }
-    renderShell();
+    const active = document.activeElement;
+    if (!(active instanceof HTMLInputElement && el.contains(active) && active.value)) renderShell();
+  }
+
+  function unsend(share: Share): void {
+    request('unsendShare', { id: share.id }).then(() => refresh('Unsent.'), (e) => refresh(errorText(e)));
   }
 
   function renderShell(): void {
@@ -108,13 +117,20 @@ export function mountFeed(root: HTMLElement): () => void {
   }
 
   function panel(): HTMLElement {
-    if (tab === 'friends') return friendsPanel(friends!, refreshFriends, notice);
-    return h('p', { class: 'iris-empty' },
-      tab === 'inbox' ? 'Videos your friends send you will show up here.' : 'Videos you send will show up here.');
+    if (tab === 'friends') return friendsPanel(friends!, refresh, notice);
+    const shares = tab === 'inbox' ? inbox : sent;
+    return h('div', {},
+      notice ? h('p', { class: 'iris-notice', role: 'status' }, notice) : null,
+      shares.length
+        ? shareGrid(shares, tab, unsend)
+        : h('p', { class: 'iris-empty' },
+            tab === 'inbox' ? 'Videos your friends send you will show up here.' : 'Videos you send will show up here.'),
+    );
   }
 
   const unsubscribe = onEvent((event) => {
     if (event.type === 'authChanged') void load();
+    else if (event.type === 'counts' && profile) void refresh(notice);
   });
   void load();
 

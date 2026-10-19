@@ -1,8 +1,13 @@
-import type { SendSharesArgs, SendSharesResult } from '../shared/types';
+import type { SendSharesArgs, SendSharesResult, Share } from '../shared/types';
 import { VIDEO_ID_PATTERN } from '../shared/video';
+import { isUnwatched, refreshCounts } from './counts';
 import { supabase } from './supabase';
 
 const NOTE_MAX = 140;
+const PROFILE_COLUMNS = 'id, handle, display_name, avatar_url';
+const SHARE_COLUMNS = 'id, video_id, title, channel, start_seconds, note, created_at';
+/** No paging yet; plenty for a private circle. */
+const LIST_LIMIT = 200;
 
 interface VideoMeta {
   title: string | null;
@@ -71,4 +76,45 @@ export async function sendShares({ videoId, recipients, note, startSeconds }: Se
     sent: results.filter((r) => !r.error).map((r) => r.recipient_id),
     alreadySent: results.filter((r) => r.error).map((r) => r.recipient_id),
   };
+}
+
+export async function getInbox(): Promise<Share[]> {
+  const { data, error } = await supabase()
+    .from('shares')
+    .select(`${SHARE_COLUMNS}, watched_at, user:profiles!shares_sender_id_fkey(${PROFILE_COLUMNS})`)
+    .eq('recipient_id', await userId())
+    .order('created_at', { ascending: false })
+    .limit(LIST_LIMIT);
+  if (error) throw error;
+  return data as unknown as Share[];
+}
+
+export async function getSent(): Promise<Share[]> {
+  // watched_at is readable by the sender under RLS, but Iris has no read receipts, so never fetch it.
+  const { data, error } = await supabase()
+    .from('shares')
+    .select(`${SHARE_COLUMNS}, user:profiles!shares_recipient_id_fkey(${PROFILE_COLUMNS})`)
+    .eq('sender_id', await userId())
+    .order('created_at', { ascending: false })
+    .limit(LIST_LIMIT);
+  if (error) throw error;
+  return (data as unknown as Omit<Share, 'watched_at'>[]).map((share) => ({ ...share, watched_at: null }));
+}
+
+export async function unsendShare(id: string): Promise<null> {
+  const { data, error } = await supabase().from('shares').delete().eq('id', id).select('id');
+  if (error) throw error;
+  if (!data.length) throw new Error('That Share is already gone');
+  return null;
+}
+
+/** Only videos with an unwatched Share reach Supabase, so it never learns the rest of your history. */
+export async function markWatched(videoId: string): Promise<number> {
+  if (!VIDEO_ID_PATTERN.test(videoId)) return 0;
+  await refreshCounts();
+  if (!isUnwatched(videoId)) return 0;
+  const { data, error } = await supabase().rpc('mark_watched', { vid: videoId });
+  if (error) throw error;
+  await refreshCounts();
+  return data as number;
 }

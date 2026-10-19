@@ -1,25 +1,31 @@
-import type { EventMessage, IrisEvent, RequestMessage, Response } from '../shared/messages';
+import type { RequestMessage, Response } from '../shared/messages';
 import { checkHandle, claimHandle, getAuthState, signIn, signOut } from './auth';
+import { broadcast } from './broadcast';
+import { refreshCounts, startCounts } from './counts';
 import { acceptRequest, cancelRequest, declineRequest, getFriends, removeFriend, sendFriendRequest } from './friends';
 import { createMenus, onMenuClicked } from './menus';
-import { getSentTo, sendShares } from './shares';
+import { getInbox, getSent, getSentTo, markWatched, sendShares, unsendShare } from './shares';
 
 const FEED_URL = 'https://www.youtube.com/feed/iris';
-
-async function broadcast(event: IrisEvent): Promise<void> {
-  const message: EventMessage = { event };
-  // Rejects when no extension page (feed.html) is open to receive it.
-  browser.runtime.sendMessage(message).catch(() => {});
-  const tabs = await browser.tabs.query({ url: 'https://www.youtube.com/*' });
-  for (const tab of tabs) {
-    if (tab.id !== undefined) browser.tabs.sendMessage(tab.id, message).catch(() => {});
-  }
-}
 
 async function changingAuth<T>(action: Promise<T>): Promise<T> {
   const result = await action;
   void broadcast({ type: 'authChanged' });
+  void refreshCounts().catch(() => {});
   return result;
+}
+
+async function changingRequests<T>(action: Promise<T>): Promise<T> {
+  const result = await action;
+  void refreshCounts().catch(() => {});
+  return result;
+}
+
+/** Focuses an open Feed tab in this window, else opens one. */
+async function openFeed(): Promise<void> {
+  const [tab] = await browser.tabs.query({ url: `${FEED_URL}*`, currentWindow: true });
+  if (tab?.id !== undefined) await browser.tabs.update(tab.id, { active: true });
+  else await browser.tabs.create({ url: FEED_URL });
 }
 
 async function openFeedPage(tabId: number | undefined): Promise<null> {
@@ -45,9 +51,9 @@ function handle(message: RequestMessage, sender: browser.runtime.MessageSender):
     case 'sendFriendRequest':
       return sendFriendRequest(message.handle);
     case 'acceptRequest':
-      return acceptRequest(message.id);
+      return changingRequests(acceptRequest(message.id));
     case 'declineRequest':
-      return declineRequest(message.id);
+      return changingRequests(declineRequest(message.id));
     case 'cancelRequest':
       return cancelRequest(message.id);
     case 'removeFriend':
@@ -56,6 +62,16 @@ function handle(message: RequestMessage, sender: browser.runtime.MessageSender):
       return getSentTo(message.videoId);
     case 'sendShares':
       return sendShares(message);
+    case 'getInbox':
+      return getInbox();
+    case 'getSent':
+      return getSent();
+    case 'unsendShare':
+      return unsendShare(message.id);
+    case 'markWatched':
+      return markWatched(message.videoId);
+    case 'getCounts':
+      return refreshCounts();
     case 'openFeedPage':
       return openFeedPage(sender.tab?.id);
   }
@@ -78,3 +94,5 @@ browser.runtime.onInstalled.addListener(({ reason }) => {
 });
 
 browser.menus.onClicked.addListener(onMenuClicked);
+browser.action.onClicked.addListener(() => void openFeed());
+startCounts();
