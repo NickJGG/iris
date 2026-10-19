@@ -23,9 +23,18 @@ function insert(): void {
   updateActive();
 }
 
+/** The Feed rides on /feed/you, so YouTube marks its own "You" entry active there too. */
+function clearYouActive(): void {
+  for (const el of document.querySelectorAll('ytd-guide-entry-renderer[active], ytd-mini-guide-entry-renderer[active]')) {
+    if (el.querySelector('a[href="/feed/you"]')) el.removeAttribute('active');
+  }
+}
+
 export function updateActive(): void {
-  if (isFeedRoute()) entry.setAttribute('aria-current', 'page');
-  else entry.removeAttribute('aria-current');
+  if (isFeedRoute()) {
+    entry.setAttribute('aria-current', 'page');
+    clearYouActive();
+  } else entry.removeAttribute('aria-current');
 }
 
 /** YouTube's subscription newness dot, on while anything is New. */
@@ -47,5 +56,8 @@ export function startGuide(): void {
     scheduled = true;
     requestAnimationFrame(check);
   }).observe(document.documentElement, { childList: true, subtree: true });
+  new MutationObserver(() => {
+    if (isFeedRoute()) clearYouActive();
+  }).observe(document.documentElement, { attributeFilter: ['active'], subtree: true });
   check();
 }
