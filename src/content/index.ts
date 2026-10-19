@@ -2,7 +2,7 @@ import { onEvent, request } from '../shared/messages';
 import { closeComposer } from '../ui/composer';
 import { injectStyles } from '../ui/styles';
 import { setGuideBadge, startGuide, updateActive } from './guide';
-import { syncRoute, unmount, watchVideoId } from './route';
+import { leaveRoute, syncRoute, watchVideoId } from './route';
 import { openSend, startSendPill } from './send';
 import { refreshShelf, startShelf } from './shelf';
 
@@ -30,7 +30,7 @@ markWatched();
 updateCounts();
 
 document.addEventListener('yt-navigate-start', () => {
-  unmount();
+  leaveRoute();
   closeComposer();
 });
 document.addEventListener('yt-navigate-finish', () => {

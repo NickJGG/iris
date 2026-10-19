@@ -37,7 +37,7 @@ The sender deleting one of their Shares, removing it from the recipient's Inbox.
 _Avoid_: delete, recall
 
 **Feed**:
-The Iris page at `youtube.com/feed/iris` where a User sees Shares, with Inbox, Sent and Friends tabs.
+The Iris page at `youtube.com/feed/you?iris` where a User sees Shares, with Inbox, Sent and Friends tabs.
 _Avoid_: timeline, inbox (that's one tab of the Feed)
 
 **From friends shelf**:

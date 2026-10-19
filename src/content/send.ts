@@ -6,7 +6,7 @@
 import { request } from '../shared/messages';
 import { closeComposer, isComposerOpen, openComposer } from '../ui/composer';
 import { eyeIcon, h } from '../ui/dom';
-import { FEED_PATH, watchVideoId } from './route';
+import { FEED_HREF, watchVideoId } from './route';
 
 const ACTION_ROW = 'ytd-watch-flexy:not([hidden]) ytd-watch-metadata #top-level-buttons-computed';
 const LIKE_BUTTONS = 'segmented-like-dislike-button-view-model, ytd-segmented-like-dislike-button-renderer';
@@ -29,7 +29,7 @@ pill.addEventListener('click', () => {
 export async function openSend(videoId: string, anchor?: HTMLElement): Promise<void> {
   // On error (e.g. Iris unconfigured) open anyway: the composer shows it.
   const auth = await request('getAuthState').catch(() => null);
-  if (auth && (!auth.signedIn || !auth.profile.handle)) return location.assign(FEED_PATH);
+  if (auth && (!auth.signedIn || !auth.profile.handle)) return location.assign(FEED_HREF);
   const currentTime = anchor ? document.querySelector<HTMLVideoElement>('#movie_player video')?.currentTime ?? 0 : undefined;
   openComposer({ videoId, anchor, currentTime });
 }

@@ -28,7 +28,7 @@ export interface Requests {
   /** Marks your unwatched Shares of this video watched; returns how many. */
   markWatched: { args: { videoId: string }; result: number };
   getCounts: { args: NoArgs; result: Counts };
-  /** Replaces the sender's tab with feed.html, for when the /feed/iris mount can't happen. */
+  /** Replaces the sender's tab with feed.html, for when the /feed/you?iris mount can't happen. */
   openFeedPage: { args: NoArgs; result: null };
 }
 

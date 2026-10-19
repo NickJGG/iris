@@ -7,7 +7,7 @@ import { request } from '../shared/messages';
 import type { Share } from '../shared/types';
 import { eyeIcon, h } from '../ui/dom';
 import { shareCard } from '../ui/share-card';
-import { FEED_PATH } from './route';
+import { FEED_HREF } from './route';
 
 const HOME_GRID = 'ytd-browse[page-subtype="home"]:not([hidden]) ytd-rich-grid-renderer';
 const MIN_CARD_WIDTH = 300;
@@ -21,7 +21,7 @@ const shelf = h('section', { class: 'iris-root iris-shelf', hidden: true, 'aria-
   h('div', { class: 'iris-shelf-head' },
     eyeIcon(),
     h('h2', { class: 'iris-shelf-title' }, 'From friends'),
-    h('a', { class: 'iris-link', href: FEED_PATH }, 'See all'),
+    h('a', { class: 'iris-link', href: FEED_HREF }, 'See all'),
   ),
   row,
 );

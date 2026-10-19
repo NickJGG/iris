@@ -130,7 +130,7 @@ export function openComposer({ videoId, anchor, currentTime }: ComposerOptions):
   function renderList(): void {
     if (!friends.length) {
       list.replaceChildren(h('p', { class: 'iris-empty' }, 'No friends yet. ',
-        h('a', { class: 'iris-link', href: '/feed/iris' }, 'Add friends')));
+        h('a', { class: 'iris-link', href: '/feed/you?iris' }, 'Add friends')));
       return;
     }
     const query = search.value.trim().replace(/^@/, '').toLowerCase();

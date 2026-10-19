@@ -1,6 +1,6 @@
 /**
  * The Feed: title, Inbox · Sent · Friends tabs, and first run while signed out. Mounts into any
- * root element, so /feed/iris on YouTube and feed.html render the same thing.
+ * root element, so /feed/you?iris on YouTube and feed.html render the same thing.
  */
 import { onEvent, request } from '../shared/messages';
 import type { FriendsState, Profile, Share } from '../shared/types';

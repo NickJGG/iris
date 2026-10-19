@@ -4,10 +4,10 @@
  * so a document observer puts the entry back whenever it goes missing.
  */
 import { eyeIcon, h } from '../ui/dom';
-import { FEED_PATH, isFeedRoute } from './route';
+import { FEED_HREF, isFeedRoute } from './route';
 
 const badge = h('span', { class: 'iris-count', hidden: true });
-const entry = h('a', { class: 'iris-guide-entry', href: FEED_PATH, title: 'Iris' },
+const entry = h('a', { class: 'iris-guide-entry', href: FEED_HREF, title: 'Iris' },
   eyeIcon(),
   h('span', { class: 'iris-guide-label' }, 'Iris'),
   badge,

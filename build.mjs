@@ -32,6 +32,7 @@ await cp(resolve(root, 'icons'), resolve(dist, 'icons'), { recursive: true });
 const options = {
   entryPoints: {
     background: resolve(root, 'src/background/index.ts'),
+    early: resolve(root, 'src/content/early.ts'),
     content: resolve(root, 'src/content/index.ts'),
     feed: resolve(root, 'src/ui/feed-page.ts'),
   },

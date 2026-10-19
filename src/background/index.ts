@@ -6,7 +6,7 @@ import { acceptRequest, cancelRequest, declineRequest, getFriends, removeFriend,
 import { createMenus, onMenuClicked } from './menus';
 import { getInbox, getSent, getSentTo, markWatched, sendShares, unsendShare } from './shares';
 
-const FEED_URL = 'https://www.youtube.com/feed/iris';
+const FEED_URL = 'https://www.youtube.com/feed/you?iris';
 
 async function changingAuth<T>(action: Promise<T>): Promise<T> {
   const result = await action;

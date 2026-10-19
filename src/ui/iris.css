@@ -37,7 +37,7 @@ html[dark] .iris-guide-entry {
   outline-offset: 2px;
 }
 
-/* Route mount: hide YouTube's error page for /feed/iris and show ours in its place. */
+/* Route mount: hide the You page's content for /feed/you?iris and show ours in its place. */
 ytd-page-manager[iris-route] > :not(.iris-host) {
   display: none !important;
 }
