@@ -1,2 +1,13 @@
-// YouTube DOM integration (guide entry, Feed route mount, shelf, Send pill) lands in Phases 2–4.
-export {};
+import { injectStyles } from '../ui/styles';
+import { startGuide, updateActive } from './guide';
+import { syncRoute, unmount } from './route';
+
+injectStyles();
+startGuide();
+syncRoute();
+
+document.addEventListener('yt-navigate-start', unmount);
+document.addEventListener('yt-navigate-finish', () => {
+  syncRoute();
+  updateActive();
+});

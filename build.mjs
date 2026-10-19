@@ -40,6 +40,7 @@ const options = {
   format: 'iife',
   target: 'firefox115',
   sourcemap: 'inline',
+  loader: { '.css': 'text' },
   logLevel: 'info',
   define: {
     __SUPABASE_URL__: JSON.stringify(supabaseUrl),

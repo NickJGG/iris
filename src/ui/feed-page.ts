@@ -1,2 +1,6 @@
-// Entry for feed.html, the fallback Feed page; mounts the Feed component from Phase 2.
-export {};
+// Entry for feed.html, the fallback Feed page outside YouTube.
+import { mountFeed } from './feed';
+import { injectStyles } from './styles';
+
+injectStyles();
+mountFeed(document.getElementById('iris-root')!);
