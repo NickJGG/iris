@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Iris for YouTube</title>
+<meta name="description" content="Send YouTube videos to friends, and see what they sent you, right inside YouTube.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e8eaed'%3E%3Ccircle cx='12' cy='11.5' r='11' fill='%23202124'/%3E%3Cpath d='M12 2A9.5 9.5 0 1 1 12 21A9.5 9.5 0 1 1 12 2ZM12 4A7.5 7.5 0 1 0 12 19A7.5 7.5 0 1 0 12 4ZM4.43 15.65L7.85 19.07A0.6 0.6 0 0 1 7.56 20.08L3.16 21.05A0.6 0.6 0 0 1 2.45 20.34L3.42 15.94A0.6 0.6 0 0 1 4.43 15.65ZM10.74 8.4L15.32 10.98A0.6 0.6 0 0 1 15.32 12.02L10.74 14.6A0.6 0.6 0 0 1 9.85 14.07L9.85 8.93A0.6 0.6 0 0 1 10.74 8.4Z'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #0f0f0f;
+    --muted: #606060;
+    --line: #e5e5e5;
+    --btn-bg: #0f0f0f;
+    --btn-fg: #ffffff;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f0f0f;
+      --fg: #f1f1f1;
+      --muted: #aaaaaa;
+      --line: #303030;
+      --btn-bg: #f1f1f1;
+      --btn-fg: #0f0f0f;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 16px/1.5 Roboto, "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  main {
+    max-width: 560px;
+    min-height: 100vh;
+    margin: 0 auto;
+    padding: 64px 16px 32px;
+    display: flex;
+    flex-direction: column;
+  }
+  .logo { width: 64px; height: 64px; color: var(--fg); }
+  h1 { margin: 24px 0 8px; font-size: 32px; line-height: 1.2; }
+  .lede { margin: 0 0 32px; color: var(--muted); font-size: 18px; }
+  .btn {
+    align-self: flex-start;
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 20px;
+    background: var(--btn-bg);
+    color: var(--btn-fg);
+    font-weight: 500;
+    text-decoration: none;
+  }
+  footer {
+    margin-top: auto;
+    padding-top: 48px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 14px;
+  }
+  footer a { color: inherit; }
+  footer p { margin: 16px 0 0; }
+</style>
+</head>
+<body>
+<main>
+  <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2A9.5 9.5 0 1 1 12 21A9.5 9.5 0 1 1 12 2ZM12 4A7.5 7.5 0 1 0 12 19A7.5 7.5 0 1 0 12 4ZM4.43 15.65L7.85 19.07A0.6 0.6 0 0 1 7.56 20.08L3.16 21.05A0.6 0.6 0 0 1 2.45 20.34L3.42 15.94A0.6 0.6 0 0 1 4.43 15.65ZM10.74 8.4L15.32 10.98A0.6 0.6 0 0 1 15.32 12.02L10.74 14.6A0.6 0.6 0 0 1 9.85 14.07L9.85 8.93A0.6 0.6 0 0 1 10.74 8.4Z"/></svg>
+  <h1>Iris for YouTube</h1>
+  <p class="lede">Send YouTube videos to friends, and see what they sent you, right inside YouTube.</p>
+  <!-- TODO: point at the AMO listing once it's live. -->
+  <a class="btn" href="https://addons.mozilla.org/firefox/search/?q=Iris%20for%20YouTube">Get it on Firefox Add-ons</a>
+  <footer>
+    <p><a href="privacy.html">Privacy policy</a></p>
+    <p>Contact: <a href="mailto:nick.gilliam2@gmail.com">nick.gilliam2@gmail.com</a></p>
+    <p>Iris is not affiliated with YouTube or Google.</p>
+  </footer>
+</main>
+</body>
+</html>
