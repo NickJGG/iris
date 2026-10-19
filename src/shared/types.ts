@@ -62,3 +62,14 @@ export interface Counts {
   /** Incoming Friend requests. */
   requests: number;
 }
+
+/** Live facts about a video from its watch page; null when unavailable. */
+export interface VideoStats {
+  views: number;
+  /** ISO; upload, or a stream's start. */
+  published: string | null;
+  lengthSeconds: number;
+  state: 'video' | 'live' | 'upcoming' | 'streamed';
+  /** Upcoming only. */
+  startsAt: string | null;
+}

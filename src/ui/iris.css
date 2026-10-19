@@ -699,6 +699,21 @@ ytd-page-manager[iris-route] > :not(.iris-host) {
   font-weight: 500;
   line-height: 20px;
 }
+.iris-share-dur {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 0 4px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+}
+.iris-share-dur[data-live] {
+  background: var(--iris-red);
+}
 .iris-share-body {
   display: flex;
   align-items: flex-start;
@@ -730,6 +745,10 @@ ytd-page-manager[iris-route] > :not(.iris-host) {
 }
 .iris-share-title + .iris-share-meta {
   margin-top: 4px;
+}
+/* Present before its stats arrive, so filling it in doesn't grow the card. */
+.iris-share-stats {
+  min-height: 20px;
 }
 .iris-share-who {
   color: var(--iris-text);

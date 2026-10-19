@@ -5,6 +5,7 @@ import { refreshCounts, startCounts } from './counts';
 import { acceptRequest, cancelRequest, declineRequest, getFriends, removeFriend, sendFriendRequest } from './friends';
 import { createMenus, onMenuClicked } from './menus';
 import { getInbox, getSent, getSentTo, markWatched, sendShares, unsendShare } from './shares';
+import { getVideoStats, pruneStats } from './stats';
 
 const FEED_URL = 'https://www.youtube.com/feed/you?iris';
 
@@ -72,6 +73,8 @@ function handle(message: RequestMessage, sender: browser.runtime.MessageSender):
       return markWatched(message.videoId);
     case 'getCounts':
       return refreshCounts();
+    case 'getVideoStats':
+      return getVideoStats(message.videoId);
     case 'openFeedPage':
       return openFeedPage(sender.tab?.id);
   }
@@ -90,9 +93,11 @@ browser.runtime.onMessage.addListener(
 
 browser.runtime.onInstalled.addListener(({ reason }) => {
   void createMenus();
+  void pruneStats();
   if (reason === 'install') void browser.tabs.create({ url: FEED_URL });
 });
 
+browser.runtime.onStartup.addListener(() => void pruneStats());
 browser.menus.onClicked.addListener(onMenuClicked);
 browser.action.onClicked.addListener(() => void openFeed());
 startCounts();

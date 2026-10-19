@@ -2,7 +2,7 @@
  * Typed request/response protocol between content/UI scripts and the background script,
  * which is the sole owner of the Supabase session. The background pushes `IrisEvent`s back.
  */
-import type { AuthState, Counts, FriendsState, HandleCheck, Profile, SendSharesArgs, SendSharesResult, Share } from './types';
+import type { AuthState, Counts, FriendsState, HandleCheck, Profile, SendSharesArgs, SendSharesResult, Share, VideoStats } from './types';
 
 type NoArgs = Record<string, never>;
 
@@ -28,6 +28,8 @@ export interface Requests {
   /** Marks your unwatched Shares of this video watched; returns how many. */
   markWatched: { args: { videoId: string }; result: number };
   getCounts: { args: NoArgs; result: Counts };
+  /** Views, age and duration from the watch page, cached a few hours; null when unavailable. */
+  getVideoStats: { args: { videoId: string }; result: VideoStats | null };
   /** Replaces the sender's tab with feed.html, for when the /feed/you?iris mount can't happen. */
   openFeedPage: { args: NoArgs; result: null };
 }
