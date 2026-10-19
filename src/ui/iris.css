@@ -41,6 +41,11 @@ html[dark] .iris-guide-entry {
 ytd-page-manager[iris-route] > :not(.iris-host) {
   display: none !important;
 }
+/* ytd-page-manager is a flex row; without this the host shrinks to its content's width. */
+.iris-host {
+  flex: 1 1 0;
+  min-width: 0;
+}
 
 /* Guide entry, matching ytd-guide-entry-renderer. */
 .iris-guide-entry {
@@ -93,8 +98,6 @@ ytd-page-manager[iris-route] > :not(.iris-host) {
 
 /* Feed shell */
 .iris-feed {
-  max-width: 1284px;
-  margin: 0 auto;
   padding: 24px 24px 48px;
   font-size: 14px;
   line-height: 20px;
