@@ -1,7 +1,8 @@
 {
   "name": "iris",
-  "version": "0.1.0",
+  "version": "1.0.1",
   "description": "Firefox extension for sending YouTube videos to friends, surfaced inside YouTube.",
+  "license": "MIT",
   "private": true,
   "type": "module",
   "scripts": {

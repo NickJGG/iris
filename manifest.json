@@ -1,12 +1,12 @@
 {
   "manifest_version": 3,
   "name": "Iris for YouTube",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Send YouTube videos to friends, and see what they sent you, right inside YouTube.",
   "browser_specific_settings": {
     "gecko": {
       "id": "iris@nick.local",
-      "strict_min_version": "115.0",
+      "strict_min_version": "140.0",
       "data_collection_permissions": {
         "required": ["authenticationInfo", "personallyIdentifyingInfo", "personalCommunications", "websiteActivity"]
       }
