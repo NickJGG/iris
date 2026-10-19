@@ -31,6 +31,16 @@ export async function signOut(): Promise<null> {
   return null;
 }
 
+export async function deleteAccount(): Promise<null> {
+  const client = supabase();
+  const { error } = await client.rpc('delete_account');
+  if (error) throw error;
+  // The server session went with the user, so a global sign-out would fail.
+  const { error: signOutError } = await client.auth.signOut({ scope: 'local' });
+  if (signOutError) throw signOutError;
+  return null;
+}
+
 export async function getAuthState(): Promise<AuthState> {
   const client = supabase();
   const { data: { session } } = await client.auth.getSession();

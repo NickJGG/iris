@@ -15,6 +15,7 @@ const moreIcon = () =>
   });
 
 export const signOutIcon = menuIcon('M20 3v18H8v-1h11V4H8V3h12zm-8.9 12.1.7.7 4.7-4.8-4.8-4.8-.7.7 3.6 3.6H4v1h10.7l-3.6 3.6z');
+export const deleteIcon = menuIcon('M11 17H9V8h2v9zm4-9h-2v9h2V8zm4-4v1h-1v16H6V5H5V4h4V3h6v1h4zm-2 1H7v15h10V5z');
 
 /**
  * A ⋮ button that opens a small action menu under it, flipping left or up when it would leave the

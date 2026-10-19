@@ -5,9 +5,10 @@
 import { onEvent, request } from '../shared/messages';
 import type { Counts, FriendsState, Profile, SeenKind, Share } from '../shared/types';
 import { avatar, displayName, errorText, logoIcon, h } from './dom';
+import { openDeleteAccount } from './delete-account';
 import { handleCard, signInCard } from './first-run';
 import { friendsPanel } from './friends';
-import { moreMenu, signOutIcon } from './menu';
+import { deleteIcon, moreMenu, signOutIcon } from './menu';
 import { shareGrid } from './share-card';
 import { showToast } from './toast';
 
@@ -144,6 +145,10 @@ export function mountFeed(root: HTMLElement): () => void {
         label: 'Sign out of Iris',
         icon: signOutIcon,
         action: () => request('signOut').then(load, (e) => show(errorCard(errorText(e)))),
+      }, {
+        label: 'Delete Iris account',
+        icon: deleteIcon,
+        action: () => openDeleteAccount(profile!, load),
       }],
       h('div', { class: 'iris-menu-head' },
         h('div', { class: 'iris-menu-head-label' }, 'Signed in to Iris as'),

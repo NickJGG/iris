@@ -217,6 +217,48 @@ begin
   if n <> 1 then raise exception 'FAIL: sender could not unsend'; end if;
 end $$;
 
+-- ===== Delete account =======================================================================
+-- Give C a friend, Shares both ways, a watch, a seen mark and an outgoing request, then delete C.
+reset role;
+insert into public.friendships (user_a, user_b) values ('00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000c');
+insert into public.shares (sender_id, recipient_id, video_id) values
+  ('00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000c', 'ddddddddddd'),
+  ('00000000-0000-0000-0000-00000000000c', '00000000-0000-0000-0000-00000000000b', 'eeeeeeeeeee');
+insert into public.share_watches (share_id, user_id)
+  select id, recipient_id from public.shares where video_id = 'ddddddddddd';
+insert into public.seen_marks (user_id, shares_seen_at) values ('00000000-0000-0000-0000-00000000000c', now());
+insert into public.friend_requests (from_id, to_id) values ('00000000-0000-0000-0000-00000000000c', '00000000-0000-0000-0000-00000000000a');
+
+set local role anon;
+do $$ begin
+  begin
+    perform public.delete_account();
+    raise exception 'FAIL: anon can call delete_account';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+
+reset role;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000c","role":"authenticated"}', true);
+set local role authenticated;
+do $$ begin perform public.delete_account(); end $$;
+
+reset role;
+do $$
+declare c uuid := '00000000-0000-0000-0000-00000000000c';
+begin
+  if exists (select 1 from auth.users where id = c) then raise exception 'FAIL: delete_account kept the auth user'; end if;
+  if exists (select 1 from public.profiles where id = c) then raise exception 'FAIL: delete_account kept the profile'; end if;
+  if exists (select 1 from public.seen_marks where user_id = c) then raise exception 'FAIL: delete_account kept seen marks'; end if;
+  if exists (select 1 from public.friendships where c in (user_a, user_b)) then raise exception 'FAIL: delete_account kept friendships'; end if;
+  if exists (select 1 from public.friend_requests where c in (from_id, to_id)) then raise exception 'FAIL: delete_account kept requests'; end if;
+  if exists (select 1 from public.shares where c in (sender_id, recipient_id)) then raise exception 'FAIL: delete_account kept shares'; end if;
+  if exists (select 1 from public.share_watches where user_id = c) then raise exception 'FAIL: delete_account kept watches'; end if;
+  if (select count(*) from auth.users where id in ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b')) <> 2 then
+    raise exception 'FAIL: delete_account deleted other users';
+  end if;
+end $$;
+
 reset role;
 rollback;
 

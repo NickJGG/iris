@@ -731,6 +731,34 @@ button.iris-send-pill {
   display: none;
 }
 
+/* A narrower, left-aligned confirm on the composer's modal. */
+.iris-composer.iris-confirm {
+  width: 440px;
+  padding: 24px;
+}
+.iris-confirm .iris-composer-title {
+  padding: 0;
+  font-size: 20px;
+  line-height: 28px;
+  text-align: left;
+}
+.iris-confirm p {
+  margin: 0 0 16px;
+}
+.iris-confirm .iris-confirm-label {
+  margin-bottom: 8px;
+}
+.iris-confirm .iris-error {
+  margin: 8px 0 0;
+}
+.iris-confirm .iris-composer-foot {
+  justify-content: flex-end;
+  margin: 16px 0 0;
+}
+.iris-confirm .iris-composer-foot .iris-btn {
+  margin-left: 0;
+}
+
 /* YouTube's bottom-left notification (yt-notification-action-renderer). */
 .iris-toast {
   position: fixed;

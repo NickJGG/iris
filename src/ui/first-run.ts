@@ -2,6 +2,8 @@ import { request } from '../shared/messages';
 import { HANDLE_PATTERN, type Profile } from '../shared/types';
 import { errorText, logoIcon, h } from './dom';
 
+const PRIVACY_URL = 'https://NickJGG.github.io/iris/privacy.html';
+
 const googleIcon = () => h('span', { class: 'iris-google-g', 'aria-hidden': 'true' }, 'G');
 
 export function signInCard(onSignedIn: () => void): HTMLElement {
@@ -24,7 +26,8 @@ export function signInCard(onSignedIn: () => void): HTMLElement {
     h('p', {}, 'See the videos your friends send you, right here on YouTube.'),
     button,
     error,
-    h('p', { class: 'iris-fine' }, 'Iris only sees your name and profile picture.'),
+    h('p', { class: 'iris-fine' }, 'Iris only sees your name, email, and profile picture. ',
+      h('a', { class: 'iris-link', href: PRIVACY_URL, target: '_blank', rel: 'noopener' }, 'Privacy policy')),
   );
 }
 

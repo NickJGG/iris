@@ -9,6 +9,8 @@ type NoArgs = Record<string, never>;
 export interface Requests {
   signIn: { args: NoArgs; result: AuthState };
   signOut: { args: NoArgs; result: null };
+  /** Deletes the User and everything that cascades from them, then signs out locally. */
+  deleteAccount: { args: NoArgs; result: null };
   getAuthState: { args: NoArgs; result: AuthState };
   checkHandle: { args: { handle: string }; result: HandleCheck };
   claimHandle: { args: { handle: string }; result: Profile };

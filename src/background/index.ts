@@ -1,5 +1,5 @@
 import type { RequestMessage, Response } from '../shared/messages';
-import { checkHandle, claimHandle, getAuthState, signIn, signOut } from './auth';
+import { checkHandle, claimHandle, deleteAccount, getAuthState, signIn, signOut } from './auth';
 import { broadcast } from './broadcast';
 import { markSeen, refreshCounts, startCounts } from './counts';
 import { acceptRequest, cancelRequest, declineRequest, getFriends, removeFriend, sendFriendRequest } from './friends';
@@ -41,6 +41,8 @@ function handle(message: RequestMessage, sender: browser.runtime.MessageSender):
       return changingAuth(signIn());
     case 'signOut':
       return changingAuth(signOut());
+    case 'deleteAccount':
+      return changingAuth(deleteAccount());
     case 'getAuthState':
       return getAuthState();
     case 'checkHandle':
