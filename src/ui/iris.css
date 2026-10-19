@@ -592,6 +592,83 @@ ytd-page-manager[iris-route] > :not(.iris-host) {
 .iris-share {
   position: relative;
   min-width: 0;
+  container-type: inline-size;
+}
+/* Sized to the chip, so the unfolded chip can be at least as wide as it. */
+.iris-share-from {
+  position: relative;
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  height: 26px;
+  margin-bottom: 8px;
+}
+.iris-share-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 3px 8px 3px 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--iris-chip);
+  color: var(--iris-text);
+  font-size: 13px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+.iris-share-when {
+  color: var(--iris-text-2);
+}
+.iris-share-chip-note {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* The chip's own layout with wrapping allowed, laid exactly over it, so line one doesn't move. */
+.iris-share-chip-full {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  align-items: flex-start;
+  width: max-content;
+  min-width: 100%;
+  max-width: 100cqw;
+  padding-bottom: 4px;
+  overflow: visible;
+  border-radius: 13px;
+  background: linear-gradient(var(--iris-chip), var(--iris-chip)), var(--iris-bg);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+  white-space: normal;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.07s ease-in, visibility 0s linear 0.07s;
+}
+.iris-share[data-cut]:is(:hover, :focus-within) .iris-share-chip-full {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.09s ease-out, visibility 0s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .iris-share-chip-full,
+  .iris-share[data-cut]:is(:hover, :focus-within) .iris-share-chip-full {
+    transition: none;
+  }
+}
+.iris-share-chip-text {
+  min-width: 0;
+  margin-top: 1px;
+  overflow-wrap: anywhere;
+}
+.iris-share-chip-text > span + span {
+  margin-left: 6px;
+}
+.iris-share-chip-full .iris-share-chip-note {
+  overflow: visible;
 }
 .iris-share-thumb {
   position: relative;
@@ -611,13 +688,13 @@ ytd-page-manager[iris-route] > :not(.iris-host) {
   position: absolute;
   top: 8px;
   left: 8px;
-  padding: 1px 4px;
-  border-radius: 4px;
-  background: var(--yt-spec-static-overlay-background-heavy, rgba(0, 0, 0, 0.8));
-  color: #fff;
+  padding: 0 6px;
+  border-radius: 6px;
+  background: #fff;
+  color: #0f0f0f;
   font-size: 12px;
   font-weight: 500;
-  line-height: 18px;
+  line-height: 20px;
 }
 .iris-share-body {
   display: flex;
@@ -654,43 +731,6 @@ ytd-page-manager[iris-route] > :not(.iris-host) {
 .iris-share-who {
   color: var(--iris-text);
   font-weight: 500;
-}
-.iris-share-meta .iris-avatar {
-  display: inline-grid;
-  margin-right: 6px;
-  vertical-align: -4px;
-}
-.iris-share-note {
-  position: relative;
-  margin-top: 4px;
-  color: var(--iris-text-2);
-  font-size: 13px;
-  font-style: italic;
-  line-height: 18px;
-}
-.iris-share-note-line {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-/* Floats over its own line and whatever is below, so the grid never reflows. */
-.iris-share-note-full {
-  display: none;
-  position: absolute;
-  top: -8px;
-  right: -10px;
-  left: -10px;
-  z-index: 3;
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: var(--iris-menu-bg);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
-  color: var(--iris-text);
-  overflow-wrap: anywhere;
-}
-.iris-share:hover .iris-share-note-full,
-.iris-share:focus-within .iris-share-note-full {
-  display: block;
 }
 .iris-share-body .iris-menu-wrap {
   margin: -8px -12px 0 0;
@@ -732,6 +772,6 @@ ytd-page-manager[iris-route] > :not(.iris-host) {
   gap: 16px;
 }
 /* Dim the parts, not the card: opacity on the card would trap the note overlay beneath later content. */
-.iris-shelf .iris-share[data-watched] :is(.iris-share-thumb, .iris-avatar, .iris-share-title, .iris-share-meta, .iris-share-note-line) {
+.iris-shelf .iris-share[data-watched] :is(.iris-share-thumb, .iris-share-body > .iris-avatar, .iris-share-title, .iris-share-meta, .iris-share-chip:not(.iris-share-chip-full)) {
   opacity: 0.55;
 }

@@ -1,7 +1,8 @@
 /**
  * The YouTube-style grid card for a Share, used by the Feed's Inbox and Sent grids and the home
- * shelf. The note is clamped to one line; on hover or focus the full note floats over it as an
- * overlay, so the card never changes size and the grid never reflows.
+ * shelf. The sender and note sit in a chip above the thumbnail. When the note is cut off, hover or
+ * focus unfolds the chip in place as an overlay, so the card never changes size and the grid never
+ * reflows.
  */
 import type { Share } from '../shared/types';
 import { avatar, displayName, h, picture } from './dom';
@@ -35,32 +36,45 @@ export function shareCard(share: Share, kind: CardKind, onUnsend?: (share: Share
   const href = watchUrl(share);
   const title = share.title ?? 'YouTube video';
   const unwatched = kind === 'inbox' && !share.watched_at;
-  const who = [avatar(share.user, 18), h('span', { class: 'iris-share-who' }, displayName(share.user))];
-  const when = timeAgo(share.created_at);
+  const chipParts = () => [
+    h('span', {}, kind === 'sent' ? 'To ' : null, h('span', { class: 'iris-share-who' }, displayName(share.user))),
+    h('span', { class: 'iris-share-when' }, `· ${timeAgo(share.created_at)}`),
+    share.note ? h('span', { class: 'iris-share-chip-note' }, `· ${share.note}`) : null,
+  ];
+  const chip = h('div', { class: 'iris-share-chip' }, avatar(share.user, 20), ...chipParts());
+  const note = chip.querySelector<HTMLElement>('.iris-share-chip-note');
+  // Measured on each hover/focus rather than observed, so grid resizes need no bookkeeping.
+  const measure = () => card.toggleAttribute('data-cut', !!note && note.scrollWidth > note.clientWidth);
 
-  return h('div', { class: 'iris-share', 'data-watched': kind === 'inbox' && !unwatched ? 'true' : null },
+  const card = h('div', {
+    class: 'iris-share',
+    'data-watched': kind === 'inbox' && !unwatched ? 'true' : null,
+    onpointerenter: measure,
+    onfocusin: measure,
+  },
+    h('div', { class: 'iris-share-from' },
+      chip,
+      note
+        ? h('div', { class: 'iris-share-chip iris-share-chip-full', 'aria-hidden': 'true' },
+            avatar(share.user, 20), h('div', { class: 'iris-share-chip-text' }, ...chipParts()))
+        : null,
+    ),
     h('a', { class: 'iris-share-thumb', href, tabindex: -1, 'aria-hidden': 'true' },
       h('img', { src: `https://i.ytimg.com/vi/${share.video_id}/mqdefault.jpg`, alt: '', loading: 'lazy' }),
-      unwatched ? h('span', { class: 'iris-share-new' }, 'NEW') : null,
+      unwatched ? h('span', { class: 'iris-share-new' }, 'New') : null,
     ),
     h('div', { class: 'iris-share-body' },
       picture(share.channel_avatar, share.channel ?? title, 36),
       h('div', { class: 'iris-share-text' },
         h('a', { class: 'iris-share-title', href, title }, title),
         share.channel ? h('div', { class: 'iris-share-meta' }, share.channel) : null,
-        h('div', { class: 'iris-share-meta' },
-          ...(kind === 'inbox' ? [...who, ` shared · ${when}`] : ['To ', ...who, ` · ${when}`])),
-        share.note
-          ? h('div', { class: 'iris-share-note' },
-              h('div', { class: 'iris-share-note-line' }, `“${share.note}”`),
-              h('div', { class: 'iris-share-note-full', 'aria-hidden': 'true' }, `“${share.note}”`))
-          : null,
       ),
       kind === 'sent' && onUnsend
         ? moreMenu(`More actions for ${title}`, [{ label: 'Unsend', action: () => onUnsend(share) }])
         : null,
     ),
   );
+  return card;
 }
 
 export function shareGrid(shares: Share[], kind: CardKind, onUnsend?: (share: Share) => void): HTMLElement {
